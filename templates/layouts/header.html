@@ -22,38 +22,51 @@
                     <a class="nav-link" href="">Blog</a>
                 </li>
             </ul>
-            <ul class="navbar-nav">
-                {% comment %} {% if user.is_authenticated %} {% endcomment %}
-                    <li class="nav-item dropdown">
-                        {% comment %} <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> {{ user.first_name }}
-                            {% if unread_notifications %}
-                                <span class="badge bg-danger">{{ unread_notifications }}</span>
-                            {% endif %}
-                        </a> {% endcomment %}
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="">Mon profil</a></li>
-                            <li><a class="dropdown-item" href="">Messagerie</a></li>
-                            <li><a class="dropdown-item" href="">Notifications</a></li>
-                            {% comment %} {% if user.role and user.role.titre in ['admin', 'moderateur'] %}
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'liste_membres' %}">Gestion membres</a></li>
-                                <li><a class="dropdown-item" href="{% url 'creer_evenement' %}">Créer événement</a></li>
-                                <li><a class="dropdown-item" href="{% url 'creer_actualite' %}">Créer actualité</a></li>
-                            {% endif %} {% endcomment %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="">Déconnexion</a></li>
-                        </ul>
-                    </li>
-                {% comment %} {% else %} {% endcomment %}
+            {% comment %} <ul class="navbar-nav">
+                {% if request.session.membres %}
+                <a href=""><img src="../{{request.session.membres.photo}} " style="width:40px; height: 40px; border-radius: 50%;" alt=""></a>
+                <li class="nav-item">
+                    <a class="nav-link" href="">{{request.session.membres.prenom}}</a>
+                </li>
+                    
+                    
+                {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'connexionPage' %}">Connexion</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'inscriptionPage' %}">Inscription</a>
                     </li>
-                {% comment %} {% endif %} {% endcomment %}
-            </ul>
+                {% endif %}
+            </ul> {% endcomment %}
+            <ul class="navbar-nav">
+                {% if request.session.membres %}
+                <a href=""><img src="../static/{{request.session.membres.photo.url}} " style="width:40px; height: 40px; border-radius: 50%;" alt=""></a>
+                    <li class="nav-item dropdown">
+                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" style="color: black;">
+                            <i class="bi bi-person-circle"></i> {{ request.session.membres.prenom }}
+                            {% if unread_notifications %}
+                                <span class="badge bg-danger">{{ unread_notifications }}</span>
+                            {% endif %}
+                        </a> 
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="">Mon profil</a></li>
+                            <li><a class="dropdown-item" href="">Messagerie</a></li>
+                            <li><a class="dropdown-item" href="">Notifications</a></li>
+                            <li class="nav-item" style="background-color: red">
+                                <a class="dropdown-item" style="color:black" href="{% url 'deconnexion' %}">Deconnexion</a>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'connexionPage' %}">Connexion</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'inscriptionPage' %}">Inscription</a>
+                    </li>
+                {% endif %}
+                </ul>
         </div>
     </div>
 </nav>

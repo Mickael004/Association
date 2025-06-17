@@ -119,7 +119,7 @@ def connexion(request):
                     "role":emailExist.role
                 }
                 request.session['membres'] = membreConnect
-                return redirect('http://127.0.0.1:8000/')
+                return redirect('accueil')
             else:
                return render(request,'login.html',{'error': "Vérifier votre Mots de passe !"}) 
             
@@ -130,7 +130,7 @@ def connexion(request):
 def deconnexion(request):
     logout(request)
     request.session.clear()
-    return redirect('loginpage')
+    return redirect('connexionPage')
 
 
 def profil(request):
