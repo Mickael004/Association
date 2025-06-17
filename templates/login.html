@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layouts/master.html' %}
 
 {% block title %}Connexion{% endblock %}
 
@@ -7,16 +7,43 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-primary text-white text-center">
                     <h3>Connexion</h3>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <div class="container">
+                        <p class="Danger text-center " style="color:red;">{{error}}</p>
+                    </div>
+                    {% comment %} {% if messages %}
+                        {% for messages in messages %}
+                        <p class="alert ">
+                            {{messages}}
+                        </p>
+                        {% endfor %}
+                    {% endif %} {% endcomment %}
+                    <form method="post" action="{% url 'connexion' %}">
                         {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="submit" class="btn btn-primary">Se connecter</button>
-                        <a href="{% url 'inscription' %}" class="btn btn-link">Créer un compte</a>
+                        <div class="md-3">
+
+                            <label for="email" class="form-label" name="email">Adresse email</label>
+                            <input type="email" class="form-control" name="email">
+                        </div>
+
+                        <div class="md-3">
+
+                            <label for="email" class="form-label" name="email">Mots de Passe</label>
+                            <input type="password" class="form-control" name="mot_de_passe">
+                        </div>
+
+                        <div class="d-grid ">
+                            <button type="submit" class="btn btn-primary">Se connecter</button>
+                        </div>
                     </form>
+                    <hr>
+                    <div class="text-center">
+                        <p class="mb-0">Pas encore membre ?</p>
+                        <a href="{% url 'inscriptionPage' %}" class="btn btn-link">Créer un compte</a>
+                    </div>
                 </div>
             </div>
         </div>

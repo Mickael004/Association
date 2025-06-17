@@ -1,0 +1,279 @@
+{% extends 'layouts/master.html' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="text-center">Devenez membre de notre association</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'inscription' %}" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Role modal et hidden -->
+                        <input type="hidden" id="role" name="role" value="membre">
+
+                        <!-- Bouton pour ouvrir la modal de sélection du rôle -->
+                        <div class="mb-4">
+                            {% comment %} <label class="form-label">Rôle dans l'association</label> {% endcomment %}
+                            <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#roleModal">
+                                <span id="roleDisplay">Membres</span>
+                                <i class="bi bi-chevron-down ms-2"></i>
+                            </button>
+                        </div>
+                        <div class="container">
+                            <p class="Danger text-center " style="color:red;">{{error}}</p>
+                        </div>
+                        <h4 class="mb-4 text-center">Informations personnelles</h4>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="nom" name="nom" 
+                                           placeholder="Votre Nom" required>
+                                    <label for="nom">Votre Nom</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="prénom" name="prenom" 
+                                           placeholder="Votre Prénom" required>
+                                    <label for="prénom">Votre Prenom</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           placeholder="email@exemple.com" required>
+                                    <label for="email">Adresse Email</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="tel" class="form-control" id="telephone" name="telephone" 
+                                           placeholder="+33 6 12 34 56 78">
+                                    <label for="telephone">Téléphone</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="date" class="form-control" id="date_naissance" name="date_naissance">
+                                    <label for="date_naissance">Date de naissance</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="photo" class="form-label">Photo de profil</label>
+                                    <input class="form-control" type="file" id="photo" name="photo" >
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <textarea class="form-control" id="adresse" name="adresse" 
+                                              placeholder="Votre adresse" style="height: 100px"></textarea>
+                                    <label for="adresse">Adresse</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mb-4 mt-4 text-center">Sécurité</h4>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="password1" name="mot_de_passe" 
+                                           placeholder="Mot de passe" required>
+                                    <label for="password1">Mot de passe</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="password2" name="confirm_pwd" 
+                                           placeholder="Confirmation" required>
+                                    <label for="password2">Confirmation</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="conditions" required>
+                                    <label class="form-check-label" for="conditions">
+                                        J'accepte les <a href="#" data-bs-toggle="modal" data-bs-target="#conditionsModal">conditions d'utilisation</a>*
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-plus"></i> S'inscrire
+                            </button>
+                            <a href="{% url 'connexionPage' %}" class="btn btn-link">
+                                Déjà membre ? Connectez-vous ici
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour sélectionner le rôle -->
+<div class="modal fade" id="roleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sélectionnez votre rôle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group">
+                    <button type="button" class="list-group-item list-group-item-action role-option" data-value="membre">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Membre</h6>
+                                <small>Accès complet aux fonctionnalités membres</small>
+                            </div>
+                            <i class="bi bi-check-lg text-primary" id="membreCheck" style="display: none;"></i>
+                        </div>
+                    </button>
+                    
+                    <button type="button" class="list-group-item list-group-item-action role-option" data-value="moderateur">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Modérateur</h6>
+                                <small>Droits de modération des contenus</small>
+                            </div>
+                            <i class="bi bi-check-lg text-primary" id="moderateurCheck" style="display: none;"></i>
+                        </div>
+                    </button>
+                    
+                    <button type="button" class="list-group-item list-group-item-action role-option" data-value="admin">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Administrateur</h6>
+                                <small>Accès complet à toutes les fonctionnalités</small>
+                            </div>
+                            <i class="bi bi-check-lg text-primary" id="adminCheck" style="display: none;"></i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Valider</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Conditions -->
+<div class="modal fade" id="conditionsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Conditions d'utilisation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Acceptation des conditions</h6>
+                <p>En devenant membre de notre association, vous acceptez...</p>
+                
+                <h6>2. Utilisation des données</h6>
+                <p>Nous nous engageons à protéger vos données personnelles...</p>
+                
+                <h6>3. Responsabilités</h6>
+                <p>En tant que membre, vous vous engagez à...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">J'ai compris</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        padding: 1.5rem;
+    }
+    
+    .form-floating label {
+        color: #6c757d;
+    }
+    
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        padding: 0.75rem;
+        font-size: 1.1rem;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+    }
+    
+    /* Media queries pour mobile */
+    @media (max-width: 768px) {
+        .card {
+            border-radius: 0;
+            border: none;
+        }
+    }
+    
+</style>
+
+<script>
+    // Gestion de la sélection du rôle
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cacher toutes les icônes de validation sauf "visiteur"
+        const roleOptions = document.querySelectorAll('.role-option');
+        const roleInput = document.getElementById('role');
+        const roleDisplay = document.getElementById('roleDisplay');
+        
+        roleOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                
+                // Mettre à jour le champ caché
+                roleInput.value = selectedValue;
+                
+                // Mettre à jour l'affichage
+                roleDisplay.textContent = this.querySelector('h6').textContent;
+                
+                // Mettre à jour les icônes de validation
+                document.querySelectorAll('.role-option i').forEach(icon => {
+                    icon.style.display = 'none';
+                });
+                this.querySelector('i').style.display = 'block';
+            });
+        });
+        
+        // Validation du formulaire
+        document.querySelector('form').addEventListener('submit', function(e) {
+            // Validation existante...
+        });
+    });
+
+</script>
+{% endblock %}

@@ -1,17 +1,18 @@
 from django.urls import path
-from . import views
+from .views import *
 
-app_name = 'membres'
 
 urlpatterns = [
     # Authentification
-    path('connexion/', views.connexion, name='connexion'),
-    path('inscription/', views.inscription, name='inscription'),
-    path('deconnexion/', views.deconnexion, name='deconnexion'),
+    path('connexion/',connexionPage,name='connexionPage'),
+    path('connexion', connexion, name='connexion'),
+    path('inscription/',inscriptionPage,name='inscriptionPage'),
+    path('inscription',inscrire_membre, name='inscription'),
+    path('deconnexion/', deconnexion, name='deconnexion'),
     
     # Profil
-    path('profil/', views.profil, name='profil'),
-    path('profil/modifier/', views.edit_profil, name='edit_profil'),
+    path('profil/', profil, name='profil'),
+    # path('profil/modifier/', views.edit_profil, name='edit_profil'),
     # path('profil/mot-de-passe/', views.change_password, name='change_password'),
     
     # Admin

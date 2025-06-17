@@ -12,11 +12,13 @@ class Utilisateur(models.Model):
     prenom = models.CharField(max_length=50)
     date_naissance = models.DateField()
     telephone = models.CharField(max_length=20)
+    adresse = models.CharField(max_length=50,blank=True, null=True)
     photo = models.ImageField(upload_to='static/images/membres/')
     email = models.EmailField()
     mot_de_passe = models.TextField()
     date_inscription = models.DateField(auto_now_add=True)
-    role = models.ForeignKey(Role,on_delete=models.CASCADE)
+    role = models.CharField(max_length=50)
+    # role = models.ForeignKey(Role,on_delete=models.CASCADE)
     
 
     USERNAME_FIELD = 'email'

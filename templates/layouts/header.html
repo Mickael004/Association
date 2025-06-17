@@ -7,52 +7,52 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'a_propos' %}">À propos</a>
+                    <a class="nav-link" href="">À propos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'liste_evenements' %}">Événements</a>
+                    <a class="nav-link" href="">Événements</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'liste_activites' %}">Activités</a>
+                    <a class="nav-link" href="">Activités</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'liste_actualites' %}">Actualités</a>
+                    <a class="nav-link" href="">Actualités</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'liste_articles' %}">Blog</a>
+                    <a class="nav-link" href="">Blog</a>
                 </li>
             </ul>
             <ul class="navbar-nav">
-                {% if user.is_authenticated %}
+                {% comment %} {% if user.is_authenticated %} {% endcomment %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        {% comment %} <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i> {{ user.first_name }}
                             {% if unread_notifications %}
                                 <span class="badge bg-danger">{{ unread_notifications }}</span>
                             {% endif %}
-                        </a>
+                        </a> {% endcomment %}
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'profil' %}">Mon profil</a></li>
-                            <li><a class="dropdown-item" href="{% url 'messagerie' %}">Messagerie</a></li>
-                            <li><a class="dropdown-item" href="{% url 'notifications' %}">Notifications</a></li>
-                            {% if user.role and user.role.titre in ['admin', 'moderateur'] %}
+                            <li><a class="dropdown-item" href="">Mon profil</a></li>
+                            <li><a class="dropdown-item" href="">Messagerie</a></li>
+                            <li><a class="dropdown-item" href="">Notifications</a></li>
+                            {% comment %} {% if user.role and user.role.titre in ['admin', 'moderateur'] %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'liste_membres' %}">Gestion membres</a></li>
                                 <li><a class="dropdown-item" href="{% url 'creer_evenement' %}">Créer événement</a></li>
                                 <li><a class="dropdown-item" href="{% url 'creer_actualite' %}">Créer actualité</a></li>
-                            {% endif %}
+                            {% endif %} {% endcomment %}
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'deconnexion' %}">Déconnexion</a></li>
+                            <li><a class="dropdown-item" href="">Déconnexion</a></li>
                         </ul>
                     </li>
-                {% else %}
+                {% comment %} {% else %} {% endcomment %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'connexion' %}">Connexion</a>
+                        <a class="nav-link" href="{% url 'connexionPage' %}">Connexion</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inscription' %}">Inscription</a>
+                        <a class="nav-link" href="{% url 'inscriptionPage' %}">Inscription</a>
                     </li>
-                {% endif %}
+                {% comment %} {% endif %} {% endcomment %}
             </ul>
         </div>
     </div>

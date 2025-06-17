@@ -12,6 +12,7 @@ class ProfilForm(forms.ModelForm):
             'email',
             'date_naissance',
             'telephone',
+            'adresse',
             'photo',
             'mot_de_passe',
             'role',
@@ -31,6 +32,7 @@ class ProfilForm(forms.ModelForm):
             'prenom': 'Prénom',
             'date_naissance': 'Date de naissance',
             'telephone': 'Téléphone',
+            'adresse':'adresse',
             'photo': 'Photo de profil',
         }
 
