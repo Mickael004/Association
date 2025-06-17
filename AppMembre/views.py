@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
 from .models import *
 # from .form import *
 import re #regex
@@ -132,14 +133,20 @@ def deconnexion(request):
     request.session.clear()
     return redirect('connexionPage')
 
-
+# Profil
 def profil(request):
-    membre_session = request.session.get('membres',{})
-    cotisation = Cotisation.objects.filter(utilisateur_id = membre_session.get('id')).order_by('-periode')
-    return render(request,('profil.html',{
-        'membre':membre_session,
-        'cotisation':cotisation
-    }))
+    if request.session.get('membres'):
+        membre_session = request.session['membres']
+        cotisation = Cotisation.objects.filter(utilisateur_id = membre_session.get('id')).order_by('-periode')
+
+        print ('Session: ',membre_session)
+        return render(request,'Profil.html',{
+            'membre':membre_session,
+            'cotisation':cotisation,
+            'MEDIA_URL':settings.MEDIA_URL
+        })
+    else:
+        return redirect('accueil')
 
 
 # def editProfil(request):

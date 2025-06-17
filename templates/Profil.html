@@ -1,0 +1,98 @@
+{% extends 'layouts/master.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row " >
+        <div class="col-md-4 marg">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>Photo de profil</h4>
+                </div>
+                <div class="card-body text-center">
+                    {% if membre.photo %}
+                        <img src="{{ MEDIA_URL }}{{ membre.photo }}" class="rounded-circle img-fluid" width="200" alt="Photo profil">
+                    {% else %}
+                        <div class="bg-secondary rounded-circle d-inline-block p-5">
+                            <i class="bi bi-person text-white" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                    <h5 class="mt-3">{{ request.session.membres.prenom }} {{ membre.nom }}</h5>
+                    <p class="text-muted">{{ membre.role|capfirst }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8 marg">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>Informations personnelles</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Email</dt>
+                        <dd class="col-sm-9">{{ membre.email }}</dd>
+                        
+                        <dt class="col-sm-3">Téléphone</dt>
+                        <dd class="col-sm-9">{{ membre.telephone|default:"Non renseigné" }}</dd>
+                        
+                        <dt class="col-sm-3">Date de naissance</dt>
+                        <dd class="col-sm-9">{{ membre.date_naissance|default:"Non renseignée" }}</dd>
+                    </dl>
+                    
+                    <div class="mt-4">
+                        <a href="" class="btn btn-primary">Modifier le profil</a>
+                        <a href="" class="btn btn-secondary">Changer le mot de passe</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white">
+                    <h4>Mes cotisations</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Période</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cotisation in cotisations %}
+                            <tr>
+                                <td>{{ cotisation.periode }}</td>
+                                <td>{{ cotisation.montant }} €</td>
+                                <td>
+                                    <span class="badge bg-{% if cotisation.statut == 'paye' %}success{% else %}danger{% endif %}">
+                                        {{ cotisation.get_statut_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">Aucune cotisation enregistrée</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    nav{
+        z-index: 1;
+        margin-top: -50px;
+    }
+    .marg{
+        margin-top: 2%;
+    }
+
+</style>
+
+{% endblock content %}
