@@ -30,7 +30,7 @@ class Utilisateur(models.Model):
     
 
 
-class  Cotisation(models.Model):
+class Cotisation(models.Model):
 
     STATUT_CHOICES = [
         ('paye','Payé'),

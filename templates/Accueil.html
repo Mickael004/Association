@@ -1,0 +1,116 @@
+{% load static %}
+
+{% block title %}Accueil - Association XYZ{% endblock %}
+
+{% block content %}
+    <section class="hero-section text-center py-5 bg-light">
+        <div class="container">
+            <h1 class="display-4">Bienvenue à l'Association XYZ</h1>
+            <p class="lead">Nous œuvrons ensemble pour une communauté plus forte et solidaire</p>
+            {% if not session.membres %}
+                <a href="{% url 'inscription' %}" class="btn btn-primary btn-lg mt-3">Rejoignez-nous</a>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Nos dernières actualités</h2>
+            <div class="row">
+                {% for actualite in actualites %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            {% if actualite.image %}
+                                <img src="{{ actualite.image.url }}" class="card-img-top" alt="{{ actualite.titre }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ actualite.titre }}</h5>
+                                <p class="card-text">{{ actualite.contenu|truncatewords:20 }}</p>
+                                <a href="{% url 'detail_actualite' pk=actualite.pk %}" class="btn btn-outline-primary">Lire la suite</a>
+                            </div>
+                            <div class="card-footer text-muted">
+                                Publié le {{ actualite.date_publication|date:"d/m/Y" }} par {{ actualite.auteur.first_name }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-4">
+                <a href="{% url 'liste_actualites' %}" class="btn btn-primary">Voir toutes les actualités</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="mb-4">Prochains événements</h2>
+                    {% for evenement in evenements %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ evenement.titre }}</h5>
+                                <p class="card-text">
+                                    <i class="bi bi-calendar-event"></i> {{ evenement.date_debut|date:"d/m/Y H:i" }}
+                                    <br>
+                                    <i class="bi bi-geo-alt"></i> {{ evenement.lieu }}
+                                </p>
+                                <a href="{% url 'detail_evenement' pk=evenement.pk %}" class="btn btn-sm btn-outline-primary">Détails</a>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>Aucun événement prévu pour le moment.</p>
+                    {% endfor %}
+                    <a href="{% url 'liste_evenements' %}" class="btn btn-primary mt-2">Voir tous les événements</a>
+                </div>
+                <div class="col-md-6">
+                    <h2 class="mb-4">Prochaines activités</h2>
+                    {% for activite in activites %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ activite.nom }}</h5>
+                                <p class="card-text">
+                                    <i class="bi bi-calendar-event"></i> {{ activite.date_organisation|date:"d/m/Y" }} à {{ activite.horaire_debut|time:"H:i" }}
+                                    <br>
+                                    <i class="bi bi-geo-alt"></i> {{ activite.lieu }}
+                                </p>
+                                <a href="{% url 'detail_activite' pk=activite.pk %}" class="btn btn-sm btn-outline-primary">Détails</a>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>Aucune activité prévue pour le moment.</p>
+                    {% endfor %}
+                    <a href="{% url 'liste_activites' %}" class="btn btn-primary mt-2">Voir toutes les activités</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Témoignages</h2>
+            <div class="row">
+                {% for temoignage in temoignages %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <i class="bi bi-quote fs-1 text-muted"></i>
+                                </div>
+                                <p class="card-text">{{ temoignage.contenu|truncatewords:30 }}</p>
+                                <p class="text-muted mt-auto">— {{ temoignage.auteur.first_name }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-4">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'creer_temoignage' %}" class="btn btn-outline-primary">Ajouter votre témoignage</a>
+                {% else %}
+                    <a href="{% url 'connexion' %}" class="btn btn-primary">Connectez-vous pour témoigner</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
