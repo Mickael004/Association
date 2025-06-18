@@ -12,6 +12,8 @@ urlpatterns = [
     
     # Profil
     path('profil/', profil, name='profil'),
+    path('modification_profil',updateProfile, name='updateProfile'),
+    path('modification_password',modif_mot_passe,name='modif_mot_passe'),
     # path('profil/modifier/', views.edit_profil, name='edit_profil'),
     # path('profil/mot-de-passe/', views.change_password, name='change_password'),
     

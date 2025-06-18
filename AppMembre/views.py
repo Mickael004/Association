@@ -152,70 +152,79 @@ def profil(request):
     else:
         return redirect('accueil')
 
-# def updateProfile(request):
-#     if request.session.get('membres'):
-#         if request.method == 'POST':
-#             membres =request.session['membres']
+def updateProfile(request):
+    if request.session.get('membres') and request.method == 'POST':
+        try:
+            membres =Utilisateur.objects.get(id=request.session['membres']['id'])
 
-#             membres['nom'] = request.POST.get('nom')
-#             membres['prenom'] = request.POST.get('prenom')
-#             membres['email'] = request.POST.get('email')
-#             membres['adresse'] = request.POST.get('adresse')
-#             membres['telephone'] = request.POST.get('telephone')
-#             membres['date_naissance']
+            membres.nom = request.POST.get('nom')
+            membres.prenom = request.POST.get('prenom')
+            membres.email = request.POST.get('email')
+            membres.adresse = request.POST.get('adresse')
+            membres.telephone = request.POST.get('telephone')
+            membres.date_naissance = request.POST.get('date_naissance')
 
-#             if 'photo' in request.FILES:
-#                 aff = membres['prenom']
-#                 long_nom = len(membres['nom'])
-#                 dernier = f"{aff[:3]}_{long_nom}"
-#                 photo = 
+            if 'photo' in request.FILES:
+                aff = membres.prenom
+                long_nom = len(membres['nom'])
+                dernier = f"{aff[:3]}_{long_nom}"
+                filename = f"images/membres/{inserer_photo(request,dernier)}" 
+                membres.photo = filename
+
+            membres.save()
+            # mise jour session
+            request.session['membres'] = {
+                'id':membres.id,
+                'nom':membres.nom,
+                'prenom':membres.prenom,
+                "date_naissance": str(membres.date_naissance),
+                "telephone":membres.telephone,
+                "adresse":membres.adresse,
+                "email" : membres.email,
+                "photo" : str(membres.photo),
+                "role":membres.role,
+                "mot_de_passe" : membres.mot_de_passe
+            }
+            request.session.modified = True
+
+            messages.success(request,'Profil Mis à jour avec success')
+
+        except Exception as e :
+            messages.error(request,f'Erreur lors de mise à jour')
+
+        return redirect('profil')
+    
+    return redirect('profil')
+
 
 def modif_mot_passe(request):
-    if request.session.get('membres'):
-        id_membre = request.session['membres']['id']
-        if request.method == 'POST':
-            ancien_motPasse = request.POST.get('ancien_password')
-            nouveau_motPasse = request.POST.get('nouveau_password')
-            confirm_motPasse = request.POST.get('confirm_password')
+    if request.method == 'POST' and request.session.get('membres'):
+        
+        ancien_motPasse = request.POST.get("ancien_password")
+        nouveau_motPasse = request.POST.get("nouveau_password")
+        confirm_motPasse = request.POST.get("confirm_password")
 
-            if not mdp_crypter(ancien_motPasse) == request.session['membres']['mot_de_passe']:
-                return render('Profil.html',{"error": "Mots de Passe incorrecte"})
-            
+        try:
+            membres = Utilisateur.objects.get(id=request.session['membres']['id'])
+
+            if not mdp_crypter(ancien_motPasse) == membres.mot_de_passe:
+                messages.error(request,"Mots de passe actuel incorrecte")
+                return redirect('profil')
+                
+        
             if nouveau_motPasse != confirm_motPasse:
                 messages.error(request,"Les nouveaux mots de passe ne correspond pas")
                 return redirect('profil')
-            
+        
             # Mise a jour
+            membres.mot_de_passe = mdp_crypter(nouveau_motPasse)
+            membres.save()
+
+            messages.success(request,"Mots de passe à jour avec succés")
+
+        except Exception as e :
+            messages.error(request,f'Erreur  lors de mise à jour')
+
+        return redirect('profil')
+    return redirect('profil')
             
-            
-
-
-
-# def editProfil(request):
-#     membre = request.session.get('membres',{})
-#     utilisateur = get_object_or_404(Utilisateur,id = membre.get('id'))
-#     if request.method =='POST':
-#         form = ProfilForm(request.POST,request.FILES,instance=utilisateur)
-#         if form.is_valid():
-#             update_utilisateur = form.save()
-#             request.session['membres'] = {
-#                 **membre,
-#                 "nom":update_utilisateur.nom,
-#                 "prenom":update_utilisateur.prenom,
-#                 "date_naissance": str(update_utilisateur.date_naissance) if update_utilisateur.date_naissance else "",
-#                 "telephone": update_utilisateur.telephone or "",
-#                 "email": update_utilisateur.email,
-#                 "photo": str(update_utilisateur.photo) if update_utilisateur.photo else "",
-#                 "role" : update_utilisateur.role
-
-#             }
-            
-#             return redirect('profil')
-#         else:
-#             form = ProfilForm(instance=utilisateur)
-    
-#     return render(request, 'edit_profil.html', {
-#         'form': form,
-    #     'membre': membre
-    # })
-

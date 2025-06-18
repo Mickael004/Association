@@ -4,6 +4,16 @@
 
     <div class="container mt-5">
         <div class="row " >
+            <div class="container text-center">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="aler alert-{% if message.tags == 'error' %}danger {% else %}{{message.tags}}{% endif %} alert dismissible fade show" >
+                            {{message}}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
             <div class="col-md-4 marg">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
@@ -98,7 +108,7 @@
                     <h5 class="modal-title" id="modifProfilModalLabel">Modifier mon profil</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="post" action="" enctype="multipart/form-data">
+                <form method="post" action="{% url 'updateProfile' %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="modal-body">
                         <div class="row">
@@ -143,7 +153,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Date de naissance</label>
-                                    <input type="date" class="form-control" name="date_naissance" value="{{ membre.date_naissance|date:'Y-m-d'|default:'' }}">
+                                    <input type="text" class="form-control" name="date_naissance" value="{{ membre.date_naissance }}">
                                 </div>
                             </div>
                         </div>
@@ -171,7 +181,7 @@
                     <h5 class="modal-title" id="Label">Changer le mot de passe</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="post" action="">
+                <form method="post" action="{% url 'modif_mot_passe' %}">
                     {% csrf_token %}
                     <div class="modal-body">
                         <div class="mb-3">
