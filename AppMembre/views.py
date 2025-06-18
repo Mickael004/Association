@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
+from django.contrib.auth.hashers import check_password, make_password
+from django.contrib import messages
 from .models import *
 # from .form import *
 import re #regex
@@ -74,8 +76,9 @@ def inscrire_membre(request):
                             "adresse":inscrire.adresse,
                             "email" : inscrire.email,
                             "photo" : str(inscrire.photo),
-                            "role" : inscrire.role
-                        }
+                            "role" : inscrire.role,
+                            "mot_de_passe": inscrire.mot_de_passe
+                            }
                         return redirect('http://127.0.0.1:8000/')
                     else:
                        return render(request,'inscription.html',{'error':"Mots de passe doit inclure au moins 8 caractères et inclue les lettre et les  chiffre"}) 
@@ -117,7 +120,8 @@ def connexion(request):
                     "adresse":emailExist.adresse,
                     "email" : emailExist.email,
                     "photo" : str(emailExist.photo),
-                    "role":emailExist.role
+                    "role":emailExist.role,
+                    "mot_de_passe" : emailExist.mot_de_passe
                 }
                 request.session['membres'] = membreConnect
                 return redirect('accueil')
@@ -147,6 +151,44 @@ def profil(request):
         })
     else:
         return redirect('accueil')
+
+# def updateProfile(request):
+#     if request.session.get('membres'):
+#         if request.method == 'POST':
+#             membres =request.session['membres']
+
+#             membres['nom'] = request.POST.get('nom')
+#             membres['prenom'] = request.POST.get('prenom')
+#             membres['email'] = request.POST.get('email')
+#             membres['adresse'] = request.POST.get('adresse')
+#             membres['telephone'] = request.POST.get('telephone')
+#             membres['date_naissance']
+
+#             if 'photo' in request.FILES:
+#                 aff = membres['prenom']
+#                 long_nom = len(membres['nom'])
+#                 dernier = f"{aff[:3]}_{long_nom}"
+#                 photo = 
+
+def modif_mot_passe(request):
+    if request.session.get('membres'):
+        id_membre = request.session['membres']['id']
+        if request.method == 'POST':
+            ancien_motPasse = request.POST.get('ancien_password')
+            nouveau_motPasse = request.POST.get('nouveau_password')
+            confirm_motPasse = request.POST.get('confirm_password')
+
+            if not mdp_crypter(ancien_motPasse) == request.session['membres']['mot_de_passe']:
+                return render('Profil.html',{"error": "Mots de Passe incorrecte"})
+            
+            if nouveau_motPasse != confirm_motPasse:
+                messages.error(request,"Les nouveaux mots de passe ne correspond pas")
+                return redirect('profil')
+            
+            # Mise a jour
+            
+            
+
 
 
 # def editProfil(request):
