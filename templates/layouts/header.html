@@ -7,7 +7,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="">À propos</a>
+                    <a class="nav-link" href="{% url 'aproposPage' %}">À propos</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="">Événements</a>
@@ -22,23 +22,6 @@
                     <a class="nav-link" href="">Blog</a>
                 </li>
             </ul>
-            {% comment %} <ul class="navbar-nav">
-                {% if request.session.membres %}
-                <a href=""><img src="../{{request.session.membres.photo}} " style="width:40px; height: 40px; border-radius: 50%;" alt=""></a>
-                <li class="nav-item">
-                    <a class="nav-link" href="">{{request.session.membres.prenom}}</a>
-                </li>
-                    
-                    
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'connexionPage' %}">Connexion</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inscriptionPage' %}">Inscription</a>
-                    </li>
-                {% endif %}
-            </ul> {% endcomment %}
             <ul class="navbar-nav">
                 {% if request.session.membres %}
                 <a href=""><img src="../static/{{request.session.membres.photo.url}} " style="width:40px; height: 40px; border-radius: 50%;" alt=""></a>
@@ -53,6 +36,10 @@
                             <li><a class="dropdown-item" href="{% url 'profil' %}">Mon profil</a></li>
                             <li><a class="dropdown-item" href="">Messagerie</a></li>
                             <li><a class="dropdown-item" href="">Notifications</a></li>
+                            {% if request.session.membres.role == 'admin' and 'moderateur' %}
+                                <li><a class="dropdown-item" href="">Liste Membre</a></li>
+                                <li><a class="dropdown-item" href="">Notre Equipe</a></li>
+                            {% endif %}
                             <li class="nav-item" style="background-color: red">
                                 <a class="dropdown-item" style="color:black" href="{% url 'deconnexion' %}">Deconnexion</a>
                             </li>

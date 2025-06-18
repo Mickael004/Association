@@ -1,0 +1,144 @@
+{% extends 'layouts/master.html' %}
+
+{% load static %}
+
+{% block title %}A propos - Youth{% endblock title %}
+
+{% block content %}
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h1 class="text-center mb-5">À propos de notre association</h1>
+            
+            <div class="row mb-5">
+                <div class="col-lg-6">
+                    <h2>Notre histoire</h2>
+                    <p>Fondée en 2010, l'Association XYZ a pour mission de rassembler les passionnés autour de valeurs communes. Depuis nos débuts modestes, nous avons grandi pour devenir une référence dans notre domaine.</p>
+                    <p>Notre engagement envers la qualité et l'innovation nous a permis de réaliser de nombreux projets ambitieux et de créer une communauté dynamique et soudée.</p>
+                </div>
+                <div class="col-lg-6">
+                    <img src="{% static 'images/histoire.jpg' %}" alt="Notre histoire" class="img-fluid rounded">
+                </div>
+            </div>
+            
+            <div class="row mb-5">
+                <div class="col-lg-6 order-lg-2">
+                    <h2>Notre mission</h2>
+                    <p>Nous nous engageons à :</p>
+                    <ul>
+                        <li>Promouvoir les échanges et le partage de connaissances</li>
+                        <li>Créer des événements fédérateurs pour notre communauté</li>
+                        <li>Soutenir les initiatives locales et solidaires</li>
+                        <li>Encourager l'innovation et la créativité</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <img src="{% static 'images/mission.jpg' %}" alt="Notre mission" class="img-fluid rounded">
+                </div>
+            </div>
+            
+            <div class="row mb-5">
+                <div class="col-lg-6">
+                    <h2>Nos valeurs</h2>
+                    <div class="card mb-3 border-0">
+                        <div class="row g-0">
+                            <div class="col-md-2 d-flex align-items-center">
+                                <i class="bi bi-people-fill fs-1 text-primary"></i>
+                            </div>
+                            <div class="col-md-10">
+                                <div class="card-body">
+                                    <h5 class="card-title">Solidarité</h5>
+                                    <p class="card-text">Nous croyons en la force du collectif et de l'entraide.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-3 border-0">
+                        <div class="row g-0">
+                            <div class="col-md-2 d-flex align-items-center">
+                                <i class="bi bi-lightbulb fs-1 text-primary"></i>
+                            </div>
+                            <div class="col-md-10">
+                                <div class="card-body">
+                                    <h5 class="card-title">Innovation</h5>
+                                    <p class="card-text">Nous encourageons la créativité et les nouvelles idées.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-3 border-0">
+                        <div class="row g-0">
+                            <div class="col-md-2 d-flex align-items-center">
+                                <i class="bi bi-shield-check fs-1 text-primary"></i>
+                            </div>
+                            <div class="col-md-10">
+                                <div class="card-body">
+                                    <h5 class="card-title">Transparence</h5>
+                                    <p class="card-text">Nous agissons avec honnêteté et clarté envers nos membres.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <img src="{% static 'images/valeurs.jpg' %}" alt="Nos valeurs" class="img-fluid rounded">
+                </div>
+            </div>
+            
+            <div class="mb-5">
+                <h2 class="text-center mb-4">Notre équipe</h2>
+                <div class="row">
+                    {% for membre in equipe %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 text-center">
+                                {% if membre.membre.photo %}
+                                    <img src="{{ membre.membre.photo.url }}" class="card-img-top rounded-circle w-50 mx-auto mt-3" alt="{{ membre.membre.get_full_name }}">
+                                {% else %}
+                                    <div class="rounded-circle bg-secondary w-50 mx-auto mt-3" style="height: 100px; line-height: 100px; color: white;">
+                                        <i class="bi bi-person fs-1"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ membre.membre.get_full_name }}</h5>
+                                    <p class="card-text text-muted">{{ membre.role }}</p>
+                                    <p class="card-text">{{ membre.membre.bio }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="mb-5">
+                <h2 class="text-center mb-4">Ce qu'ils disent de nous</h2>
+                <div class="row">
+                    {% for temoignage in temoignages %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <i class="bi bi-quote fs-1 text-muted"></i>
+                                    </div>
+                                    <p class="card-text">{{ temoignage.contenu }}</p>
+                                    <p class="text-muted mt-auto">— {{ temoignage.auteur.get_full_name }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-4">
+                    {% if request.session.membres %}
+                        <a href="{% url 'creer_temoignage' %}" class="btn btn-primary">Ajouter votre témoignage</a>
+                    {% else %}
+                        <a href="{% url 'connexionPage' %}" class="btn btn-primary">Connectez-vous pour témoigner</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        nav{
+            z-index: 100;
+        }
+    </style>
+{% endblock %}

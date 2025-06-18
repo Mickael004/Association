@@ -52,6 +52,13 @@ class ParticipationEvenement(models.Model):
 
 
 class Activite(models.Model):
+    ROLE_CHOICES = (
+        ('en_attent','En attente'),
+        ('en_cours','En cours'),
+        ('termine','Terminé'),
+        ('annule','Annulé')
+
+    )
     nom = models.CharField(max_length=200)
     description = models.TextField()
     date_organisation = models.DateField()

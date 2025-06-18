@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'AppActualite',
     'AppBlog',
     'AppMessagerie',
+    'AppEquipe',
 ]
 
 MIDDLEWARE = [

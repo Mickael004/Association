@@ -9,7 +9,7 @@ from AppMembre.models import Utilisateur
 
 def listEvenement(request):
     date_aujour = timezone.now()
-    evenement_tous = Evenement.objects.order_by('-date_creation')
+    evenement_tous = Evenement.objects.all().order_by('-date_creation')
     evenement_a_venir = Evenement.objects.filter(date_debut__gte = date_aujour).order_by('-date_creation')
     evenement_passe = Evenement.objects.filter(date_debut__lt = date_aujour).order_by('-date_creation')
 
@@ -87,3 +87,16 @@ def participer_evenement(request,form_id):
 
     if evenement.participants.filter(id=request.session['membres']['id']).exists():
         evenement.participants.remove(Utilisateur.id)
+
+
+
+
+
+
+# ################ ACTIVITES ################
+
+def listActivites(request):
+    
+    activite_tous = Activite.objects.all().order_by('-date_creation')
+
+    pass
