@@ -5,14 +5,14 @@
 {% block title %}A propos - Youth{% endblock title %}
 
 {% block content %}
-    <section class="py-5 bg-light">
-        <div class="container">
+    <section class="py-5 bg-light ">
+        <div class="container marg">
             <h1 class="text-center mb-5">À propos de notre association</h1>
             
             <div class="row mb-5">
                 <div class="col-lg-6">
                     <h2>Notre histoire</h2>
-                    <p>Fondée en 2010, l'Association XYZ a pour mission de rassembler les passionnés autour de valeurs communes. Depuis nos débuts modestes, nous avons grandi pour devenir une référence dans notre domaine.</p>
+                    <p>Fondée en 2024, Youth Empworetment a pour mission de rassembler les jeunes passionnés autour de valeurs communes. Depuis nos débuts modestes, nous avons grandi pour devenir une référence dans notre domaine.</p>
                     <p>Notre engagement envers la qualité et l'innovation nous a permis de réaliser de nombreux projets ambitieux et de créer une communauté dynamique et soudée.</p>
                 </div>
                 <div class="col-lg-6">
@@ -127,7 +127,7 @@
                 </div>
                 <div class="text-center mt-4">
                     {% if request.session.membres %}
-                        <a href="{% url 'creer_temoignage' %}" class="btn btn-primary">Ajouter votre témoignage</a>
+                        <a href="" class="btn btn-primary">Ajouter votre témoignage</a>
                     {% else %}
                         <a href="{% url 'connexionPage' %}" class="btn btn-primary">Connectez-vous pour témoigner</a>
                     {% endif %}
@@ -139,6 +139,9 @@
     <style>
         nav{
             z-index: 100;
+        }
+        .marg{
+            margin-top: 2%;
         }
     </style>
 {% endblock %}
