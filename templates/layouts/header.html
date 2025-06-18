@@ -10,7 +10,7 @@
                     <a class="nav-link" href="{% url 'aproposPage' %}">À propos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="">Événements</a>
+                    <a class="nav-link" href="{% url 'evenements' %}">Événements</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="">Activités</a>
@@ -36,7 +36,7 @@
                             <li><a class="dropdown-item" href="{% url 'profil' %}">Mon profil</a></li>
                             <li><a class="dropdown-item" href="">Messagerie</a></li>
                             <li><a class="dropdown-item" href="">Notifications</a></li>
-                            {% if request.session.membres.role == 'admin' and 'moderateur' %}
+                            {% if request.session.membres.role in 'admin moderateur' %}
                                 <li><a class="dropdown-item" href="">Liste Membre</a></li>
                                 <li><a class="dropdown-item" href="">Notre Equipe</a></li>
                             {% endif %}

@@ -8,16 +8,25 @@ from AppMembre.models import Utilisateur
 
 
 def listEvenement(request):
-    date_aujour = timezone.now()
-    evenement_tous = Evenement.objects.all().order_by('-date_creation')
-    evenement_a_venir = Evenement.objects.filter(date_debut__gte = date_aujour).order_by('-date_creation')
-    evenement_passe = Evenement.objects.filter(date_debut__lt = date_aujour).order_by('-date_creation')
+    filtre = request.GET.get('filtre','tout')
+
+    aujourdhui = timezone.now()
+    evenements = Evenement.objects.all()
+
+    if filtre == 'prochainement':
+        evenements = evenements.filter(date_debut__gt=aujourdhui).order_by('date_debut')
+    elif filtre == 'en_cour':
+        evenements = evenements.filter(date_debut__lte=aujourdhui, date_fin__gt = aujourdhui).order_by('date_debut')
+
+    else:
+        evenements = evenements.order_by('date_debut')
 
     context = {
-        'evenements_venir' : evenement_a_venir,
-        'evenement_passer':evenement_passe,
-        'evenement_tous' : evenement_tous
+        'evenements':evenements,
+        'filtre_actif':filtre,
+        'aujourdhui':aujourdhui
     }
+
     return render(request,'Evenement.html',context)
 
 # detail

@@ -3,8 +3,171 @@
 {% block title %}Evenement - Youth{% endblock title %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h2>Evenement</h2>
-        
+<div class="container-fluid mt-5">
+    <div class="bg-light py-2 shadow-sm">
+        <div class="container  marg">
+            <div class="d-flex flex-wrap gap-2 filtre" >
+                <a href="?filtre=tout" 
+                   class="btn btn-sm {% if filtre_actif == 'tout' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    Tout
+                </a>
+                <a href="?filtre=prochainement" 
+                   class="btn btn-sm {% if filtre_actif == 'prochainement' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    Prochainement
+                </a>
+                <a href="?filtre=en_cours" 
+                   class="btn btn-sm {% if filtre_actif == 'en_cours' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    En cours
+                </a>
+                <a href="?filtre=termines" 
+                   class="btn btn-sm {% if filtre_actif == 'termines' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    Terminés
+                </a>
+            </div>
+        </div>
     </div>
+
+    {% if request.session.membres.role in 'admin moderateur' %}
+        <div class="btn-ajout">
+            <a href="" class="btn btn-primary btn-lg rounded-pill shadow">
+                <i class="bi bi-plus-lg"></i> Ajouter Evenement
+            </a>
+        </div>
+    {% endif %}
+
+     <!-- Liste des événements avec filtre -->
+     <div class="container py-4">
+        <h2 class="mb-4 text-center">
+            {% if filtre_actif == 'tout' %}
+                Tous les événements
+            {% elif filtre_actif == 'prochainement' %}
+                Événements à venir
+            {% elif filtre_actif == 'en_cours' %}
+                Événements en cours
+            {% else %}
+                Événements terminés
+            {% endif %}
+        </h2>
+
+        {% if evenements %}
+        <div class="row g-4">
+            {% for evenement in evenements %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    {% if event.image %}
+                    <img src="{{ evenement.image.url }}" class="card-img-top" alt="{{ evenement.titre }}" style="height: 180px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">{{ event.titre }}</h5>
+                            <span class="badge 
+                                {% if evenement.date_debut > aujourdhui %}bg-info
+                                {% elif evenement.date_fin < now %}bg-secondary
+                                {% else %}bg-success{% endif %}">
+                                {% if evenement.date_debut > aujourdhui %}À venir
+                                {% elif evenement.date_fin < aujourdhui %}Terminé
+                                {% else %}En cours{% endif %}
+                            </span>
+                        </div>
+                        <p class="card-text text-muted small">
+                            <i class="bi bi-calendar-event"></i> 
+                            {{ evenement.date_debut }}
+                            {% if evenement.date_fin %}
+                            - {{ evenement.date_fin}}
+                            {% endif %}
+                        </p>
+                        <p class="card-text">{{ evenement.description|truncatewords:20 }}</p>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <a href="{% url 'detail_evenement' evenement.id %}" class="btn btn-sm btn-outline-primary">
+                            Voir détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            Aucun événement trouvé .
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+    <style>
+        nav{
+            z-index: 100;
+            margin-top: -50px;
+        }
+        .marg{
+            margin-top: 1%;
+        } 
+        .filtre{
+            justify-content: center;
+            /* position: fixed; */
+            width: 100%;
+        }
+        /* Style pour la barre de filtres */
+        .filter-bar {
+            position: sticky;
+            top: 56px;
+            z-index: 1020;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+
+        /* Style pour la barre de filtres */
+        .btn-ajout{
+            position: fixed;
+            left: 100%;
+            bottom: 65%;
+            transform: translateX(-50%) translateY(50%) rotate(90deg);
+            transform-origin: left center;
+            z-index: 1000;
+        }
+        .btn-ajout a{
+            transform: rotate(-90deg);
+            white-space: nowrap;
+            padding: 0.75rem 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ajout a:hover{
+            transform: rotate(-90deg)scale(1.05);
+        }
+
+        @media (max-width:992px) {
+            .btn-ajout{
+                left:70%;
+                transform: none;
+                bottom: 50%;
+            }
+            .btn-ajout a {
+                transform: none;
+            }
+            .btn-ajout a:hover {
+                transform: scale(1.05);
+            }
+        }
+
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+        }
+    </style>
 {% endblock content %}

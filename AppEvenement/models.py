@@ -2,14 +2,14 @@ from django.db import models
 from AppMembre.models import Utilisateur
 
 # Create your models here.
-class Evenement(models.Model):
-    ROLE_CHOICES = (
-        ('en_attent','En attente'),
-        ('en_cours','En cours'),
-        ('termine','Terminé'),
-        ('annule','Annulé')
+    # ROLE_CHOICES = (
+    #     ('prochainement','Prochainement'),
+    #     ('en_cours','En cours'),
+    #     ('termine','Terminé'),
+    #     ('annule','Annulé')
 
-    )
+    # )
+class Evenement(models.Model):
     titre = models.CharField(max_length=100)
     description = models.TextField()
     date_debut = models.DateTimeField()
@@ -17,7 +17,6 @@ class Evenement(models.Model):
     lieu = models.CharField(max_length=200)
     nombre_participant_max = models.PositiveIntegerField(blank=True,null=True)
     image = models.ImageField(upload_to='static/images/evenements',blank=True,null=True)
-    statut = models.CharField(max_length=10,choices=ROLE_CHOICES,default='en_attent')
 
     createur = models.ForeignKey(Utilisateur,on_delete=models.SET_NULL, null=True)
     date_creation = models.DateTimeField(auto_now_add=True)
