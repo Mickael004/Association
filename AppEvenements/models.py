@@ -43,16 +43,10 @@ class ParticipationEvenement(models.Model):
 
 
 class Activite(models.Model):
-    ROLE_CHOICES = (
-        ('en_attent','En attente'),
-        ('en_cours','En cours'),
-        ('termine','Terminé'),
-        ('annule','Annulé')
 
-    )
     nom = models.CharField(max_length=200)
     description = models.TextField()
-    date_organisation = models.DateField()
+    date_activites = models.DateField()
     horaire_debut = models.TimeField()
     horaire_fin = models.TimeField( blank=True, null=True)
     lieu = models.CharField(max_length=200)
@@ -65,7 +59,7 @@ class Activite(models.Model):
     class Meta:
         verbose_name = "Activité"
         verbose_name_plural = "Activités"
-        ordering = ['-date_organisation']
+        ordering = ['-date_activites']
     
     def __str__(self):
         return self.nom

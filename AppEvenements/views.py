@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import *
-from django.utils import timezone
+from django.utils import timezone,timesince
 from AppMembre.models import Utilisateur
 
 import os
@@ -122,9 +122,7 @@ def inserer_photo(request, titre):
                 destination.write(chunk)
         
         return chemin_relatif  
-    
-
-    
+       
 
 def creer_evenement(request):
     if request.session.get('membres',{}).get('role') in ['admin','moderateur']:
@@ -157,7 +155,6 @@ def creer_evenement(request):
                         image = chemin_image
                     )
                     evenements.save()
-                    messages.success(request,'Evenement Creer avec succes')
                     return redirect('evenements')
             
             except Exception as e :
@@ -176,23 +173,161 @@ def creer_evenement(request):
 
 
 
-# Participation Evenement
-
-def participer_evenement(request,form_id):
-    evenement = get_object_or_404(Evenement, form_id=form_id)
-
-    if evenement.participants.filter(id=request.session['membres']['id']).exists():
-        evenement.participants.remove(Utilisateur.id)
-
-
-
-
 
 
 # ################ ACTIVITES ################
 
 def listActivites(request):
-    
-    activite_tous = Activite.objects.all().order_by('-date_creation')
+    filtre = request.GET.get('filtre','tout')
 
-    pass
+    aujourdhui = timezone.now()
+    activites = Activite.objects.all()
+
+    if filtre == 'prochainement':
+        activites = activites.filter(date_activites__gt=aujourdhui).order_by('date_activites')
+    elif filtre == 'termines':
+        activites = activites.filter(date_activites__lte=aujourdhui).order_by('date_activites')
+
+    else:
+        activites = activites.order_by('date_activites')
+
+    context = {
+        'activites':activites,
+        'filtre_actif':filtre,
+        'aujourdhui':aujourdhui
+    }
+
+    return render(request,'Activite.html',context)
+
+def detail_activite(request,form_id):
+    activites = get_object_or_404(Activite, id=form_id)
+    maintenant = timezone.now()
+
+    # status
+    if activites.date_activites > maintenant:
+        statut = "À venir"
+        badge_class = "bg-info"
+    # elif activite.date_fin < maintenant:
+    #     statut = "Terminé"
+    #     badge_class = "bg-secondary"
+    else:
+        statut = "Terminé"
+        badge_class = "bg-secondary"
+        # statut = "En cours"
+        # badge_class = "bg-success"
+
+    # verification inscrit
+    est_inscrit = False
+    if request.session.get('membres'):
+        est_inscrit = activites.participants.filter(
+            id = request.session['membres']['id']
+        ).exists()
+
+    # Gestion participant
+    if request.method == 'POST' and 'action' in request.POST:
+        if request.session.get('membres'):
+
+            utilisateur = Utilisateur.objects.get(id = request.session['membres']['id'])
+
+            if request.POST['action'] == 'participer' :
+
+                
+                    # evenement.nombre_participants.add(utilisateur)
+                ParticipationActivite.objects.get_or_create(
+                activite=activites,
+                participant=utilisateur
+                )
+                messages.success(request, "Vous êtes maintenant inscrit à cet activite")
+            
+            elif request.POST['action'] == 'annuler' :
+                # evenement.nombre_participants.remove(utilisateur)
+
+                ParticipationActivite.objects.filter(
+                    activites=activites,
+                    participant=utilisateur
+                ).delete()
+                messages.success(request, "Votre participation a été annulée")
+        
+            return redirect('detail_activite', form_id=form_id)
+
+        else :
+            messages.error(request, "Vous devez être connecté pour participer")
+            return redirect('connexion')
+    
+
+    context = {
+        'activites': activites,
+        'statut': statut,
+        'badge_class': badge_class,
+        'est_inscrit': est_inscrit,
+        'maintenant': maintenant,
+        'membre': request.session.get('membres', {})
+    }
+
+    return render(request, 'ActiviteDetail.html', context)
+
+
+def inserer_photo_activite(request, titre):
+    if 'image' in request.FILES:
+        image = request.FILES['image']
+        nom_fichier = f"{titre.replace(' ', '_')}_{image.name}.jpg"
+        chemin_relatif = os.path.join('images/activites', nom_fichier)
+        
+        
+        chemin_absolu = os.path.join(settings.MEDIA_ROOT, 'images/activites', nom_fichier)
+        
+        
+        os.makedirs(os.path.dirname(chemin_absolu), exist_ok=True)
+        
+        
+        with default_storage.open(chemin_absolu, 'wb+') as destination:
+            for chunk in image.chunks():
+                destination.write(chunk)
+        
+        return chemin_relatif
+    
+
+def creer_activite(request):
+    if request.session.get('membres',{}).get('role') in ['admin','moderateur']:
+        if request.method == 'POST':
+            nom = request.POST.get('nom')
+            description = request.POST.get('description')
+            date_activites = request.POST.get('date_activites')
+            horaire_debut = request.POST.get('horaire_debut')
+            horaire_fin = request.POST.get('horaire_fin')
+            lieu = request.POST.get('lieu')
+            # nom imqge
+            nom_image = f"{nom}_{date_activites}"
+
+            try : 
+                createur = Utilisateur.objects.get(id= request.session['membres']['id'])
+
+                if'image' in request.FILES:
+                    chemin_image = inserer_photo_activite(request,nom_image)
+
+                    activites = Activite(
+                        nom=nom,
+                        description=description,
+                        date_activites=date_activites,
+                        horaire_debut=horaire_debut,
+                        horaire_fin=horaire_fin,
+                        lieu=lieu,
+                        createur=createur,
+                        image = chemin_image
+                    )
+                    activites.save()
+                    return redirect('activites')
+            
+            except Exception as e :
+                messages.error(request, f"Une erreur est survenue: {str(e)}")
+                return redirect('activites')
+
+    else:
+        messages.error(request, "Accès réserver au Administrateur.")
+        return redirect('accueil')
+        
+    context = {
+        'membre' : request.session.get('membres')
+    }
+
+    return render(request,'ActiviteCreer.html',context)

@@ -76,7 +76,7 @@
                             - {{ evenement.date_fin}}
                             {% endif %}
                         </p>
-                        <p class="card-text">{{ evenement.titre|truncatewords:20 }}</p>
+                        <h6 class="card-text">{{ evenement.titre|truncatewords:20 }}</h6>
                     </div>
                     <div class="card-footer bg-white">
                         <a href="{% url 'detail_evenement' evenement.id %}" class="btn btn-sm btn-outline-primary">

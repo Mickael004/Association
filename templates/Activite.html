@@ -1,0 +1,172 @@
+{% extends 'layouts/master.html' %}
+
+{% block title %}Activites - Youth{% endblock title %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="bg-light py-2 shadow-sm">
+        <div class="container  marg">
+            <div class="d-flex flex-wrap gap-2 filtre" >
+                <a href="?filtre=tout" 
+                   class="btn btn-sm {% if filtre_actif == 'tout' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    Tout
+                </a>
+                <a href="?filtre=prochainement" 
+                   class="btn btn-sm {% if filtre_actif == 'prochainement' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    Prochainement
+                </a>
+                <a href="?filtre=termines" 
+                   class="btn btn-sm {% if filtre_actif == 'termines' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    Terminés
+                </a>
+            </div>
+        </div>
+    </div>
+{% comment %} Bouton Ajouter {% endcomment %}
+    {% if request.session.membres.role in 'admin moderateur' %}
+        <div class="btn-ajout">
+            <a href="{% url 'creer_activite' %}" class="btn btn-primary btn-lg rounded-pill shadow">
+                <i class="bi bi-plus-lg"></i> Nouvelle Activité
+            </a>
+        </div>
+    {% endif %}
+
+     <!-- Liste des événements avec filtre -->
+     <div class="container py-4">
+        <h2 class="mb-4 text-center">
+            {% if filtre_actif == 'tout' %}
+                Tous les Activité
+            {% elif filtre_actif == 'prochainement' %}
+                Activité à venir
+            {% comment %} {% elif filtre_actif == 'en_cours' %}
+                Événements en cours {% endcomment %}
+            {% else %}
+                Activité terminés
+            {% endif %}
+        </h2>
+
+        {% if activites %}
+        <div class="row g-4">
+            {% for activite in activites %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    {% if activite.image %}
+                    <img src="{{ activite.image.url }}" class="card-img-top" alt="{{ activite.titre }}" style="height: 180px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                             <h5 class="card-title mb-0">{{ event.nom }}</h5> 
+                            <span class="badge 
+                                {% if activite.date_debut > aujourdhui %}bg-info
+                                {% elif activite.date_fin < aujourdhui %}bg-secondary
+                                {% else %}bg-success{% endif %}">
+                                {% if activite.date_activites > aujourdhui %}À venir
+                                {% elif activite.date_activites < aujourdhui %}Terminé
+                                {% else %}En cours{% endif %}
+                            </span>
+                        </div>
+                        <p class="card-text text-muted small">
+                            <i class="bi bi-calendar-event"></i> 
+                            {{ activite.date_activites }}
+                            {% if activite.date_activites %} 
+                            - {{activite.horaire_debut}} à {{ activite.horaire_fin}}
+                            {% endif %}
+                        </p>
+                        <h6 class="card-text">{{ activite.nom|truncatewords:20 }}</h6>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <a href="{% url 'detail_activite' activite.id %}" class="btn btn-sm btn-outline-primary">
+                            Voir détails
+                        </a>
+                        {% comment %} <a href="" class="btn btn-sm btn-outline-primary">
+                            Voir détails
+                        </a> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            Aucun Activité trouvé .
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+    <style>
+        nav{
+            z-index: 100;
+            margin-top: -50px;
+        }
+        .marg{
+            margin-top: 1%;
+        } 
+        .filtre{
+            justify-content: center;
+            /* position: fixed; */
+            width: 100%;
+        }
+        /* Style pour la barre de filtres */
+        .filter-bar {
+            position: sticky;
+            top: 56px;
+            z-index: 1020;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+
+        /* Style pour la barre de filtres */
+        .btn-ajout{
+            position: fixed;
+            left: 100%;
+            bottom: 65%;
+            transform: translateX(-50%) translateY(50%) rotate(90deg);
+            transform-origin: left center;
+            z-index: 1000;
+        }
+        .btn-ajout a{
+            transform: rotate(-90deg);
+            white-space: nowrap;
+            padding: 0.75rem 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ajout a:hover{
+            transform: rotate(-90deg)scale(1.05);
+        }
+
+        @media (max-width:992px) {
+            .btn-ajout{
+                left:70%;
+                transform: none;
+                bottom: 50%;
+            }
+            .btn-ajout a {
+                transform: none;
+            }
+            .btn-ajout a:hover {
+                transform: scale(1.05);
+            }
+        }
+
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+        }
+    </style>
+{% endblock content %}

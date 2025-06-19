@@ -1,0 +1,167 @@
+{% extends 'layouts/master.html' %}
+
+{% block title %}Evenement - Youth{% endblock title %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center marg">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="text-center" ><i class="bi bi-calendar-plus "></i> Créer un nouvel activité</h3>
+                </div>
+                <div class="card-body">
+
+                    {% if messages %}
+                        <div class="mb-3">
+                            {% for message in messages %}
+                                <div class="alert alert-{% if message.tags == 'error' %}danger {% else %}success{% endif %} ">
+                                    {{message}}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <form method="post" action="{% url 'creer_activite' %}" enctype="multipart/form-data" >
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="titre" class="form-label">Nom Activité</label>
+                            <input type="text" class="form-control" id="nom" name="nom" 
+                                   value="{{ request.POST.nom }}" required>
+                            <div class="invalid-feedback">Veuillez saisir un Nom</div>
+                        </div>
+                        
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description activité</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="5" required>{{ request.POST.description }}</textarea>
+                        </div>
+
+                        <div class=" mb-3">
+                            <label for="date_debut" class="form-label">Date  Activité</label>
+                            <input type="date" class="form-control" id="date_activites" 
+                                   name="date_activites" value="{{ request.POST.date_activites }}" required>
+                        </div>
+                        
+                        <div class="row">
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="horaire_debut" class="form-label">Heure Début</label>
+                                <input type="time" class="form-control" id="horaire_debut" 
+                                       name="horaire_debut" value="{{ request.POST.horaire_debut }}"  step="300" min="08:00" max="18:00" required>
+                            </div>
+                            
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="horaire_fin" class="form-label">Heure de fin</label>
+                                <input type="time" class="form-control" id="horaire_fin" 
+                                       name="horaire_fin" value="{{ request.POST.horaire_fin }}"  step="300" min="09:00" max="19:00" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Lieu -->
+                        <div class="mb-3">
+                            <label for="lieu" class="form-label">Lieu </label>
+                            <input type="text" class="form-control" id="lieu" name="lieu" 
+                                   value="{{ request.POST.lieu }}" required>
+                        </div>
+                        
+                        <!-- Image -->
+                        <div class="mb-4">
+                            <label for="image" class="form-label">Image de l'activité</label>
+                            <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                            <div class="form-text">Format recommandé : 1200x630 pixels</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'activites' %}" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Créer Activité</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    nav{
+        z-index: 100;
+    }
+    .marg{
+        margin-top: 2%;
+    }
+    .card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1.5rem;
+    }
+
+    .form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .invalid-feedback {
+        display: none;
+        color: #dc3545;
+    }
+
+    .is-invalid {
+        border-color: #dc3545;
+    }
+
+    .is-invalid + .invalid-feedback,
+    .is-invalid ~ .invalid-feedback {
+        display: block;
+    }
+
+    /* Bouton de soumission */
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+    }
+</style>
+    
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        let isValid = true;
+        const requiredFields = ['nom', 'description', 'date_activites', 'lieu'];
+        
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        // Validation des dates
+        const heureDebut = document.getElementById('date_debut').value;
+        const heureFin = document.getElementById('date_fin').value;
+        
+        if (heureFin && new time(heureFin) < new time(heureDebut)) {
+            alert('La date de fin doit être postérieure à la date de début');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Veuillez corriger les erreurs dans le formulaire');
+        }
+    });
+</script>
+{% endblock content %}
