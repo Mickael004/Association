@@ -1,0 +1,172 @@
+{% extends 'layouts/master.html' %}
+{% load static %}
+
+{% block title %}Gestion de l'équipe{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12 marg">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="card-title mb-0 text-center">
+                            <i class="bi bi-people-fill me-2"></i>Gestion des membres de l'équipe
+                        </h2>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 60px">Photo</th>
+                                        <th>Membre</th>
+                                        <th>Contact</th>
+                                        <th>Statut</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in membres_avec_statut %}
+                                    <tr>
+                                        <td>
+                                            {% if item.membre.photo %}
+                                            <img src="{{ item.membre.photo.url }}" 
+                                                class="rounded-circle object-fit-cover" 
+                                                width="50" height="50" 
+                                                alt="{{ item.membre.get_full_name }}">
+                                            {% else %}
+                                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" 
+                                                style="width: 50px; height: 50px;">
+                                                <i class="bi bi-person text-white"></i>
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <strong>{{ item.membre.prenom }} {{ item.membre.nom }}</strong>
+                                            {% if item.dans_equipe %}
+                                            <div class="text-muted small mt-1">
+                                                {{ item.role_equipe }}
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div>{{ item.membre.email }}</div>
+                                            <div class="text-muted small">{{ item.membre.telephone }}</div>
+                                        </td>
+                                        <td>
+                                            {% if item.dans_equipe %}
+                                            <span class="badge bg-success rounded-pill">
+                                                <i class="bi bi-check-circle me-1"></i>Equipe
+                                            </span>
+                                            {% else %}
+                                            <span class="badge bg-secondary rounded-pill">
+                                                <i class="bi bi-dash-circle me-1"></i>Non membre
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            {% if item.dans_equipe %}
+                                            <button class="btn btn-outline-danger btn-sm" 
+                                                    onclick="confirmRetrait('{{ item.membre.prenom }}', '{{ item.membre.nom }}', {{ item.membre.id }})">
+                                                <i class="bi bi-person-dash"></i> Retirer dans Equipe
+                                            </button>
+                                            {% else %}
+                                            <button class="btn btn-outline-primary btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#ajouterModal"
+                                                    onclick="prepareAjout('{{ item.membre.prenom }}', '{{ item.membre.nom }}', {{ item.membre.id }})">
+                                                <i class="bi bi-person-plus"></i> Ajouter Dans Equipe
+                                            </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-light">
+                        <small class="text-muted">
+                            {{ membres_avec_statut|length }} membres affichés
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajout à l'équipe -->
+    <div class="modal fade" id="ajouterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="post" action="{% url 'ajouter_equipe' 0 %}" id="ajouterForm">
+                    {% csrf_token %}
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            <i class="bi bi-person-plus me-2"></i>Ajouter à l'équipe
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Membre sélectionné</label>
+                            <input type="text" class="form-control-plaintext fw-bold" id="membreNom" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Rôle dans l'équipe</label>
+                            <input type="text" class="form-control" id="role" name="role" required
+                                placeholder="Ex: Président, Trésorier...">
+                        </div>
+                        <div class="mb-3">
+                            <label for="ordre_affichage" class="form-label">Ordre d'affichage</label>
+                            <input type="number" class="form-control" id="ordre_affichage" 
+                                name="ordre_affichage" value="0" min="0">
+                            <div class="form-text">Détermine l'ordre d'apparition dans la liste</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i>Annuler
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-1"></i>Confirmer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function prepareAjout(prenom, nom, membreId) {
+            document.getElementById('membreNom').value = prenom + ' ' + nom;
+            const form = document.getElementById('ajouterForm');
+            form.action = form.action.replace('/0/', '/' + membreId + '/');
+            document.getElementById('role').focus();
+        }
+
+        function confirmRetrait(prenom, nom, membreId) {
+            const confirmation = confirm(`Voulez-vous vraiment retirer ${prenom} ${nom} de l'équipe ?`);
+            if (confirmation) {
+                window.location.href = "{% url 'retirer_equipe' 0 %}".replace('/0/', '/' + membreId + '/');
+            }
+        }
+    </script>
+
+    <style>
+        nav{
+            z-index: 100;
+        }
+        .marg{
+            margin-top: 2%;
+        }
+        .object-fit-cover {
+            object-fit: cover;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+    </style>
+{% endblock %}
