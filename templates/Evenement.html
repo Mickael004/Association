@@ -54,7 +54,7 @@
             {% for evenement in evenements %}
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 shadow-sm">
-                    {% if event.image %}
+                    {% if evenement.image %}
                     <img src="{{ evenement.image.url }}" class="card-img-top" alt="{{ evenement.titre }}" style="height: 180px; object-fit: cover;">
                     {% endif %}
                     <div class="card-body">
@@ -62,7 +62,7 @@
                             <h5 class="card-title mb-0">{{ event.titre }}</h5>
                             <span class="badge 
                                 {% if evenement.date_debut > aujourdhui %}bg-info
-                                {% elif evenement.date_fin < now %}bg-secondary
+                                {% elif evenement.date_fin < aujourdhui %}bg-secondary
                                 {% else %}bg-success{% endif %}">
                                 {% if evenement.date_debut > aujourdhui %}À venir
                                 {% elif evenement.date_fin < aujourdhui %}Terminé
@@ -76,10 +76,13 @@
                             - {{ evenement.date_fin}}
                             {% endif %}
                         </p>
-                        <p class="card-text">{{ evenement.description|truncatewords:20 }}</p>
+                        <p class="card-text">{{ evenement.titre|truncatewords:20 }}</p>
                     </div>
                     <div class="card-footer bg-white">
-                        <a href="{% url 'detail_evenement' evenement.id %}" class="btn btn-sm btn-outline-primary">
+                        {% comment %} <a href="{% url 'detail_evenement' evenement.id %}" class="btn btn-sm btn-outline-primary">
+                            Voir détails
+                        </a> {% endcomment %}
+                        <a href="" class="btn btn-sm btn-outline-primary">
                             Voir détails
                         </a>
                     </div>
