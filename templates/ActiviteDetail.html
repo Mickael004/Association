@@ -7,7 +7,7 @@
     <div class="row marg">
         <div class="col-lg-8 mx-auto">
             <div class="card shadow">
-                {% if evenement.image %}
+                {% if activites.image %}
                 <img src="{{ activites.image.url }}" class="card-img-top" alt="{{ activites.nom }}">
                 {% endif %}
                 
@@ -51,17 +51,17 @@
                         <form method="post">
                             {% csrf_token %}
                             {% if est_inscrit %}
-                            <button type="submit" name="action" value="annuler" 
-                                    class="btn btn-danger">
-                                Annuler ma participation
-                            </button>
+                                <button type="submit" name="action" value="annuler" 
+                                        class="btn btn-danger">
+                                    Annuler ma participation
+                                </button>
                             {% else %}
-                            <button type="submit" name="action" value="participer" 
-                                    class="btn btn-primary"
-                                    {% if activites.date_debut < maintenant %}disabled{% endif %}
-                                    >
-                                Participer à cet Activité
-                            </button>
+                                <button type="submit" name="action" value="participer" 
+                                        class="btn btn-primary"
+                                        {% if activites.date_activites < maintenant %}disabled{% endif %}
+                                        >
+                                    Participer à cet Activité
+                                </button>
                             {% endif %}
                         </form>
                     </div>

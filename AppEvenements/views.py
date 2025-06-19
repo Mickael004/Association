@@ -201,7 +201,7 @@ def listActivites(request):
 
 def detail_activite(request,form_id):
     activites = get_object_or_404(Activite, id=form_id)
-    maintenant = timezone.now()
+    maintenant = timezone.now().date()
 
     # status
     if activites.date_activites > maintenant:
@@ -219,7 +219,8 @@ def detail_activite(request,form_id):
     # verification inscrit
     est_inscrit = False
     if request.session.get('membres'):
-        est_inscrit = activites.participants.filter(
+        est_inscrit = ParticipationActivite.objects.filter(
+            activite = activites,
             id = request.session['membres']['id']
         ).exists()
 
