@@ -26,10 +26,10 @@
             </div>
         </div>
     </div>
-
+{% comment %} Bouton Ajouter {% endcomment %}
     {% if request.session.membres.role in 'admin moderateur' %}
         <div class="btn-ajout">
-            <a href="" class="btn btn-primary btn-lg rounded-pill shadow">
+            <a href="{% url 'creer_evenement' %}" class="btn btn-primary btn-lg rounded-pill shadow">
                 <i class="bi bi-plus-lg"></i> Ajouter Evenement
             </a>
         </div>

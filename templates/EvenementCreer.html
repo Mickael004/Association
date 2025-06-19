@@ -1,0 +1,170 @@
+{% extends 'layouts/master.html' %}
+
+{% block title %}Evenement - Youth{% endblock title %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center marg">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="text-center" ><i class="bi bi-calendar-plus "></i> Créer un nouvel événement</h3>
+                </div>
+                <div class="card-body">
+
+                    {% if messages %}
+                        <div class="mb-3">
+                            {% for message in messages %}
+                                <div class="alert alert-{% if message.tags == 'error' %}danger {% else %}success{% endif %} ">
+                                    {{message}}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <form method="post" action="{% url 'creer_evenement' %}" enctype="multipart/form-data" >
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="titre" class="form-label">Titre Evenement</label>
+                            <input type="text" class="form-control" id="titre" name="titre" 
+                                   value="{{ request.POST.titre }}" required>
+                            <div class="invalid-feedback">Veuillez saisir un titre</div>
+                        </div>
+                        
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description*</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="5" required>{{ request.POST.description }}</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="date_debut" class="form-label">Date de début</label>
+                                <input type="datetime-local" class="form-control" id="date_debut" 
+                                       name="date_debut" value="{{ request.POST.date_debut }}" required>
+                            </div>
+                            
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="date_fin" class="form-label">Date de fin</label>
+                                <input type="datetime-local" class="form-control" id="date_fin" 
+                                       name="date_fin" value="{{ request.POST.date_fin }}">
+                            </div>
+                        </div>
+                        
+                        <!-- Lieu -->
+                        <div class="mb-3">
+                            <label for="lieu" class="form-label">Lieu </label>
+                            <input type="text" class="form-control" id="lieu" name="lieu" 
+                                   value="{{ request.POST.lieu }}" required>
+                        </div>
+                        
+                        <!-- Nombre max de participants -->
+                        <div class="mb-3">
+                            <label for="nombre_participant_max" class="form-label">Nombre maximum de participants</label>
+                            <input type="number" class="form-control" id="nombre_participant_max" 
+                                   name="nombre_participant_max" min="1"
+                                   value="{{ request.POST.nombre_participant_max }}">
+                            <div class="form-text">Laissez vide pour aucune limite</div>
+                        </div>
+                        
+                        <!-- Image -->
+                        <div class="mb-4">
+                            <label for="image" class="form-label">Image de l'événement</label>
+                            <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                            <div class="form-text">Format recommandé : 1200x630 pixels</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'evenements' %}" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Créer l'événement</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    nav{
+        z-index: 100;
+    }
+    .marg{
+        margin-top: 2%;
+    }
+    .card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1.5rem;
+    }
+
+    .form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .invalid-feedback {
+        display: none;
+        color: #dc3545;
+    }
+
+    .is-invalid {
+        border-color: #dc3545;
+    }
+
+    .is-invalid + .invalid-feedback,
+    .is-invalid ~ .invalid-feedback {
+        display: block;
+    }
+
+    /* Bouton de soumission */
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+    }
+</style>
+    
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        let isValid = true;
+        const requiredFields = ['titre', 'description', 'date_debut', 'lieu'];
+        
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        // Validation des dates
+        const dateDebut = document.getElementById('date_debut').value;
+        const dateFin = document.getElementById('date_fin').value;
+        
+        if (dateFin && new Date(dateFin) < new Date(dateDebut)) {
+            // alert('La date de fin doit être postérieure à la date de début');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            // alert('Veuillez corriger les erreurs dans le formulaire');
+        }
+    });
+</script>
+{% endblock content %}
