@@ -4,6 +4,9 @@ from .models import *
 from django.utils import timezone
 from AppMembre.models import Utilisateur
 
+import os
+from django.conf import settings
+from django.core.files.storage import default_storage
 # Create your views here.
 
 
@@ -101,14 +104,24 @@ def detail_evenement(request,form_id):
     return render(request, 'EvenementDetail.html', context)
 
 # insertion imqge
-def inserer_photo(request,titre):
-    if request.FILES.get("photo"):
-        image = request.FILES.get("image")
-        #Enregistrement avec nom unique
-        with open(f"static/images/evenements/{titre}.jpg","wb") as destination:
+def inserer_photo(request, titre):
+    if 'image' in request.FILES:
+        image = request.FILES['image']
+        nom_fichier = f"{titre.replace(' ', '_')}_{image.name}.jpg"
+        chemin_relatif = os.path.join('images/evenements', nom_fichier)
+        
+        
+        chemin_absolu = os.path.join(settings.MEDIA_ROOT, 'images/evenements', nom_fichier)
+        
+        
+        os.makedirs(os.path.dirname(chemin_absolu), exist_ok=True)
+        
+        
+        with default_storage.open(chemin_absolu, 'wb+') as destination:
             for chunk in image.chunks():
                 destination.write(chunk)
-        return f"{titre}.jpg"
+        
+        return chemin_relatif  
     
 
     
@@ -129,21 +142,23 @@ def creer_evenement(request):
                 createur = Utilisateur.objects.get(id= request.session['membres']['id'])
 
                 nombre_max = int(nombre_participant_max) if nombre_participant_max else None
-                evenements = Evenement(
-                    titre=titre,
-                    description=description,
-                    date_debut=date_debut,
-                    date_fin=date_fin,
-                    lieu=lieu,
-                    nombre_participant_max = nombre_max,
-                    createur=createur,
-                )
-
+                
                 if'image' in request.FILES:
-                    evenements.image = request.FILES['image']
-                evenements.save()
-                messages.success(request,'Evenement Creer avec succes')
-                return redirect('evenements')
+                    chemin_image = inserer_photo(request,nom_image)
+
+                    evenements = Evenement(
+                        titre=titre,
+                        description=description,
+                        date_debut=date_debut,
+                        date_fin=date_fin,
+                        lieu=lieu,
+                        nombre_participant_max = nombre_max,
+                        createur=createur,
+                        image = chemin_image
+                    )
+                    evenements.save()
+                    messages.success(request,'Evenement Creer avec succes')
+                    return redirect('evenements')
             
             except Exception as e :
                 messages.error(request, f"Une erreur est survenue: {str(e)}")

@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container py-5">
-    <div class="row">
+    <div class="row marg">
         <div class="col-lg-8 mx-auto">
             <div class="card shadow">
                 {% if evenement.image %}
@@ -50,7 +50,7 @@
                             <img src="{{ evenement.createur.photo.url }}" 
                                  class="rounded-circle me-3" width="50" alt="Organisateur">
                             {% endif %}
-                            <span>{{ evenement.createur.get_full_name }}</span>
+                            <span>{{ evenement.createur.nom }} {{ evenement.createur.prenom }}</span>
                         </div>
                     </div>
                     
@@ -89,6 +89,15 @@
         </div>
     </div>
 </div>
+
+<style>
+    nav{
+        z-index: 100;
+    }
+    .marg{
+        margin-top: 2%;
+    }
+</style>
 
 
 {% endblock %}
