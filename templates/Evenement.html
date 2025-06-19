@@ -79,12 +79,12 @@
                         <p class="card-text">{{ evenement.titre|truncatewords:20 }}</p>
                     </div>
                     <div class="card-footer bg-white">
-                        {% comment %} <a href="{% url 'detail_evenement' evenement.id %}" class="btn btn-sm btn-outline-primary">
-                            Voir détails
-                        </a> {% endcomment %}
-                        <a href="" class="btn btn-sm btn-outline-primary">
+                        <a href="{% url 'detail_evenement' evenement.id %}" class="btn btn-sm btn-outline-primary">
                             Voir détails
                         </a>
+                        {% comment %} <a href="" class="btn btn-sm btn-outline-primary">
+                            Voir détails
+                        </a> {% endcomment %}
                     </div>
                 </div>
             </div>

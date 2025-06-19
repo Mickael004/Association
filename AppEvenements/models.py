@@ -13,7 +13,7 @@ class Evenement(models.Model):
     createur = models.ForeignKey(Utilisateur,on_delete=models.SET_NULL, null=True)
     date_creation = models.DateTimeField(auto_now_add=True)
 
-    nombre_participants = models.ManyToManyField(Utilisateur, related_name="evenement_participes", blank=True)
+    nombre_participants = models.ManyToManyField(Utilisateur, related_name="evenement_participes", blank=True,through="ParticipationEvenement")
 
     class Meta:
         verbose_name = "Événement"

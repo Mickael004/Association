@@ -31,15 +31,74 @@ def listEvenement(request):
 
     return render(request,'Evenement.html',context)
 
-# detail
+# detail Evenement et Participation
 def detail_evenement(request,form_id):
-    evenement = Evenement.objects.get(id=form_id)
+    evenement = get_object_or_404(Evenement, id=form_id)
+    maintenant = timezone.now()
+
+    # status
+    if evenement.date_debut > maintenant:
+        statut = "À venir"
+        badge_class = "bg-info"
+    elif evenement.date_fin < maintenant:
+        statut = "Terminé"
+        badge_class = "bg-secondary"
+    else:
+        statut = "En cours"
+        badge_class = "bg-success"
+
+    # verification inscrit
+    est_inscrit = False
+    if request.session.get('membres'):
+        est_inscrit = evenement.nombre_participants.filter(
+            id = request.session['membres']['id']
+        ).exists()
+
+    # Gestion participant
+    if request.method == 'POST' and 'action' in request.POST:
+        if request.session.get('membres'):
+
+            utilisateur = Utilisateur.objects.get(id = request.session['membres']['id'])
+
+            if request.POST['action'] == 'participer' :
+
+                if(evenement.nombre_participant_max and evenement.nombre_participants.count()>= evenement.nombre_participant_max):
+                    messages.error(request,"Desole l'evenement est complet")
+
+                else:
+                    # evenement.nombre_participants.add(utilisateur)
+                    ParticipationEvenement.objects.get_or_create(
+                    evenement=evenement,
+                    participant=utilisateur
+                )
+                messages.success(request, "Vous êtes maintenant inscrit à cet événement")
+            
+            elif request.POST['action'] == 'annuler' :
+                # evenement.nombre_participants.remove(utilisateur)
+
+                ParticipationEvenement.objects.filter(
+                    evenement=evenement,
+                    participant=utilisateur
+                ).delete()
+                messages.success(request, "Votre participation a été annulée")
+        
+            return redirect('detail_evenement', form_id=form_id)
+
+        else :
+            messages.error(request, "Vous devez être connecté pour participer")
+            return redirect('connexion')
+    
 
     context = {
-        'detail_evenement':evenement
+        'evenement': evenement,
+        'statut': statut,
+        'badge_class': badge_class,
+        'est_inscrit': est_inscrit,
+        'maintenant': maintenant,
+        'membre': request.session.get('membres', {})
     }
 
-    return render(request,'DetailEvenement.html')
+    return render(request, 'EvenementDetail.html', context)
 
 # insertion imqge
 def inserer_photo(request,titre):
@@ -52,10 +111,6 @@ def inserer_photo(request,titre):
         return f"{titre}.jpg"
     
 
-# creer Evenement
-def creer_page(request):
-    if request.session.get('membres'):
-        return render(request,'EvenementCreer.html')
     
 
 def creer_evenement(request):
@@ -88,11 +143,11 @@ def creer_evenement(request):
                     evenements.image = request.FILES['image']
                 evenements.save()
                 messages.success(request,'Evenement Creer avec succes')
-                return redirect('evenement')
+                return redirect('evenements')
             
             except Exception as e :
                 messages.error(request, f"Une erreur est survenue: {str(e)}")
-                return redirect('evenement')
+                return redirect('evenements')
 
     else:
         messages.error(request, "Accès réserver au Administrateur.")
