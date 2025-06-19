@@ -39,7 +39,6 @@ def ajouter_equipe(request, membre_id):
                 'ordre_affichage': ordre_affichage
             }
         )
-        messages.success(request, f"{membre.prenom} {membre.nom} a été ajouté à l'équipe")
         return redirect('liste_membres')
     
     # Si GET, on affiche juste la modal via le template
@@ -48,5 +47,11 @@ def ajouter_equipe(request, membre_id):
 def retirer_equipe(request, membre_id):
     membre = get_object_or_404(Utilisateur, id=membre_id)
     Equipe.objects.filter(membre=membre).delete()
-    messages.success(request, f"{membre.prenom} {membre.nom} a été retiré de l'équipe")
     return redirect('liste_membres')
+
+
+def notre_equipe(request):
+    equipe_membres = Equipe.objects.select_related('membre').order_by('ordre_affichage')
+    return render(request, 'NotreEquipe.html', {
+        'equipe_membres': equipe_membres
+    })
