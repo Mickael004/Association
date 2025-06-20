@@ -8,5 +8,5 @@ urlpatterns = [
 
     path('activite/',listActivites,name='activites'),
     path('ajout_activite',creer_activite,name='creer_activite'),
-    path('detail_activite/<int:form_id>/',detail_activite,name='detail_activite'),
+    path('activite/<int:form_id>/',detail_activite,name='detail_activite'),
 ]

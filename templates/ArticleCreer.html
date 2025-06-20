@@ -1,0 +1,126 @@
+{% extends 'layouts/master.html' %}
+
+{% block title %}Nouvel Article de Blog{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-lg marg">
+                    <div class="card-header bg-primary text-white ">
+                        <h2 class="h4 mb-0 ">
+                            <i class="bi bi-pencil-square me-2"></i>Créer un nouvel article
+                        </h2>
+                    </div>
+                    
+                    <div class="card-body">
+                        {% if messages %}
+                        <div class="alert alert-danger">
+                            {% for message in messages %}
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Titre -->
+                            <div class="mb-4">
+                                <label for="titre" class="form-label fw-bold">Titre de l'article </label>
+                                <input type="text" class="form-control form-control-lg" 
+                                    id="titre" name="titre" 
+                                    value="{{ request.POST.titre }}"
+                                    placeholder="Titre d'accrocheur..." required>
+                                <div class="invalid-feedback">
+                                    Veuillez saisir un titre pour votre article.
+                                </div>
+                            </div>
+                            
+                            <!-- Contenu -->
+                            <div class="mb-4">
+                                <label for="contenue" class="form-label fw-bold">Contenu </label>
+                                <textarea class="form-control" id="contenue" name="contenue" 
+                                        rows="12" required
+                                        placeholder="Rédigez votre article ici...">{{ request.POST.contenue }}</textarea>
+                                <div class="invalid-feedback">
+                                    Le contenu de l'article est obligatoire.
+                                </div>
+                                <div class="form-text">
+                                    Utilisez le markdown pour la mise en forme.
+                                </div>
+                            </div>
+                            
+                            <!-- Image -->
+                            <div class="mb-4">
+                                <label for="image" class="form-label fw-bold">Image mise en avant</label>
+                                <input type="file" class="form-control" 
+                                    id="image" name="image"
+                                    accept="image/jpeg, image/png">
+                            </div>
+                            
+                            <!-- Publication -->
+                            <div class="mb-4 form-check form-switch">
+                                <input class="form-check-input" type="checkbox" 
+                                    id="publie" name="publie" 
+                                    {% if publie %}checked{% endif %}>
+                                <label class="form-check-label fw-bold" for="publie">
+                                    Publier immédiatement
+                                </label>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{% url 'listeArticle' %}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i> Annuler
+                                </a>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-save me-1"></i> Enregistrer l'article
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('.needs-validation')
+            
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })
+    </script>
+
+    <style>
+        nav{
+            z-index: 100;
+        }
+        .marg{
+            margin-top: 2%;
+        }
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+        }
+        .form-control-lg {
+            font-size: 1.1rem;
+        }
+        textarea.form-control {
+            min-height: 250px;
+        }
+    </style>
+{% endblock %}
