@@ -1,0 +1,161 @@
+{% extends 'layouts/master.html' %}
+{% load static %}
+
+{% block title %}Actualités - Youth{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+        <h2 class=" mb-4 text-center marg">Actualités</h2>
+        {% if request.session.membres.role in 'admin moderateur membre' %}
+            <div class="btn-ajout">
+                <a href="{% url 'creer_actualite' %}" class="btn btn-primary rounded-pill shadow">
+                    <i class="bi bi-plus-lg"></i> Nouvelle actualité
+                </a>
+            </div>
+        {% endif %}
+
+
+        {% if messages %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+
+    <div class="list-group largeur">
+        {% for actualite in actualites %}
+        <div class="list-group-item mb-3 rounded shadow-sm">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-person"></i> {{ actualite.auteur.nom }} {{ actualite.auteur.prenom }}
+                        <i class="bi bi-calendar ms-2"></i> {{ actualite.date_publication|date:"d/m/Y H:i" }}
+                    </p>
+                </div>
+                
+            </div>
+
+            {% if actualite.image %}
+            <img src="{{ actualite.image.url }}" class="img-fluid rounded my-2 "  alt="{{ actualite.titre }}">
+            {% endif %}
+            <h2 class="h5 mb-1">{{ actualite.titre }}</h2>
+            <div class="mt-2 mb-3">
+                {{ actualite.contenue|linebreaks }}
+            </div>
+            <button class="btn btn-link text-primary p-0" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#commentairesModal"
+                        onclick="loadComments({{ actualite.id }})">
+                    <i class="bi bi-chat-left-text"></i> Commentaires
+                </button>
+
+            {% if request.session.membres %}
+            <form method="post" action="{% url 'ajouter_commentaire' actualite.id %}" class="mt-3">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" name="message" class="form-control" placeholder="Ajouter un commentaire..." required>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-send">Envoyer</i>
+                    </button>
+                </div>
+            </form>
+            {% else %}
+            <div class="alert alert-info mt-3 py-2">
+                <a href="{% url 'connexionPage' %}" class="alert-link">Connectez-vous</a> pour commenter
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="alert alert-info">Aucune actualité disponible pour le moment.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal Commentaires -->
+<div class="modal fade" id="commentairesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">Tous les Commentaires</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="commentairesContainer">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    nav{
+        z-index: 100;
+    }
+    .marg{
+        margin-top: 2%;
+    }
+    .btn-ajout{
+        position: fixed;
+        left: 100%;
+        bottom: 65%;
+        transform: translateX(-50%) translateY(50%) rotate(90deg);
+        transform-origin: left center;
+        z-index: 1000;
+    }
+    .btn-ajout a{
+        transform: rotate(-90deg);
+        white-space: nowrap;
+        padding: 0.75rem 1.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-ajout a:hover{
+        transform: rotate(-90deg)scale(1.05);
+    }
+
+    @media (max-width:992px) {
+        .btn-ajout{
+            left:70%;
+            transform: none;
+            bottom: 50%;
+        }
+        .btn-ajout a {
+            transform: none;
+        }
+        .btn-ajout a:hover {
+            transform: scale(1.05);
+        }
+    }
+
+    .largeur{
+        width: 70%;
+        margin: auto;
+    }
+</style>
+
+<script>
+function loadComments(actualiteId) {
+    fetch(`/actualite/${actualiteId}/commentaires/`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('commentairesContainer').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('commentairesContainer').innerHTML = `
+                <div class="alert alert-danger">
+                    Erreur lors du chargement des commentaires
+                </div>
+            `;
+        });
+}
+</script>
+{% endblock %}

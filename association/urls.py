@@ -28,5 +28,6 @@ urlpatterns = [
     path('',include('AppEvenements.urls')),
     path('',include('AppEquipe.urls')),
     path('',include('AppBlog.urls')),
+    path('',include('AppActualite.urls')),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
