@@ -14,7 +14,7 @@
         <div>
             <div class="d-flex justify-content-between">
                 <h6 class="mb-1">{{ commentaire.auteur.nom }} {{ commentaire.auteur.prenom }}</h6>
-                <small class="text-muted">{{ commentaire.date_commentaire|timesince }}</small>
+                <small class="text-muted">({{ commentaire.date_commentaire|timesince }})</small>
             </div>
             <p class="mb-0">{{ commentaire.message }}</p>
         </div>
