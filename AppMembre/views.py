@@ -8,6 +8,9 @@ import re #regex
 from datetime import datetime
 import hashlib
 from django.contrib.auth import logout
+import os
+from django.conf import settings
+from django.core.files.storage import default_storage
 # Create your views here.
 
 def mdp_crypter(mot_de_passe):
@@ -16,14 +19,24 @@ def mdp_crypter(mot_de_passe):
     mdp.update(mot_de_passe.encode('utf-8'))
     return mdp.hexdigest()
 
-def inserer_photo(request,nom):
-    if request.FILES.get("photo"):
-        image = request.FILES.get("photo")
-        #Enregistrement avec nom unique
-        with open(f"static/images/membres/{nom}.jpg","wb") as destination:
-            for chunk in image.chunks():
+def inserer_photo(request, nom):
+    if 'photo' in request.FILES:
+        photo = request.FILES['photo']
+        nom_fichier = f"{nom.replace(' ', '_')}_{photo.name}"
+        chemin_relatif = os.path.join('images/utilisateurs', nom_fichier)
+        
+        
+        chemin_absolu = os.path.join(settings.MEDIA_ROOT, 'images/utilisateurs', nom_fichier)
+        
+        
+        os.makedirs(os.path.dirname(chemin_absolu), exist_ok=True)
+        
+        
+        with default_storage.open(chemin_absolu, 'wb+') as destination:
+            for chunk in photo.chunks():
                 destination.write(chunk)
-        return f"{nom}.jpg"
+        
+        return chemin_relatif
     
 def inscriptionPage(request):
     if request.session.get('membres'):
@@ -37,7 +50,6 @@ def inscrire_membre(request):
         date_naissance = request.POST.get('date_naissance')
         telephone = request.POST.get("telephone")
         adresse = request.POST.get("adresse")
-        photo = request.FILES.get("photo")
         emails = request.POST.get("email")
         mot_de_passe = request.POST.get("mot_de_passe")
         role = request.POST.get("role")
@@ -47,39 +59,41 @@ def inscrire_membre(request):
             if not Utilisateur.objects.filter(email=emails).exists():
                 if mot_de_passe==confirm_pwd:
                     if len(mot_de_passe)>= 8 and re.search(r'[A-Za-z]',mot_de_passe) and re.search(r'[0-9]',mot_de_passe):
+                            
                         aff = prenom
                         long_nom = len(nom)
                         dernier = f"{aff[:3]}_{long_nom}"
-                        
-                        inscrire = Utilisateur(
-                            nom=nom,
-                            prenom = prenom,
-                            date_naissance = date_naissance,
-                            telephone = telephone,
-                            adresse = adresse,
-                            photo = f"static/images/membres/{inserer_photo(request,dernier)}" ,
-                            email = emails,
-                            date_inscription = datetime.now(),
-                            mot_de_passe = mdp_crypter(mot_de_passe),
-                            role = role
-                            
-                        )
-                        inscrire.save()
-                        #creation session
+                        if 'photo' in request.FILES:
+                            chemin_image = inserer_photo(request,dernier)
+                            inscrire = Utilisateur(
+                                nom=nom,
+                                prenom = prenom,
+                                date_naissance = date_naissance,
+                                telephone = telephone,
+                                adresse = adresse,
+                                photo = chemin_image ,
+                                email = emails,
+                                date_inscription = datetime.now(),
+                                mot_de_passe = mdp_crypter(mot_de_passe),
+                                role = role
+                                
+                            )
+                            inscrire.save()
+                            #creation session
 
-                        request.session['membres'] = {
-                            "id" : inscrire.id,
-                            "nom" : inscrire.nom,
-                            "prenom" : inscrire.prenom,
-                            "date_naissance" : inscrire.date_naissance,
-                            "telephone":inscrire.telephone,
-                            "adresse":inscrire.adresse,
-                            "email" : inscrire.email,
-                            "photo" : str(inscrire.photo),
-                            "role" : inscrire.role,
-                            "mot_de_passe": inscrire.mot_de_passe
-                            }
-                        return redirect('http://127.0.0.1:8000/')
+                            request.session['membres'] = {
+                                "id" : inscrire.id,
+                                "nom" : inscrire.nom,
+                                "prenom" : inscrire.prenom,
+                                "date_naissance" : inscrire.date_naissance,
+                                "telephone":inscrire.telephone,
+                                "adresse":inscrire.adresse,
+                                "email" : inscrire.email,
+                                "photo" : str(inscrire.photo),
+                                "role" : inscrire.role,
+                                "mot_de_passe": inscrire.mot_de_passe
+                                }
+                            return redirect('http://127.0.0.1:8000/')
                     else:
                        return render(request,'inscription.html',{'error':"Mots de passe doit inclure au moins 8 caractères et inclue les lettre et les  chiffre"}) 
                 else:
