@@ -1,8 +1,10 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from django.contrib import messages
-from .models import Actualite,Commentaire
+from .models import Actualite,Commentaire,ImageActualite
 from django.utils import timezone,timesince
 from AppMembre.models import Utilisateur
+from AppEvenements.models import Evenement,Activite
+from django.urls import reverse
 
 import os
 from django.conf import settings
@@ -57,18 +59,23 @@ def creer_actualite(request):
                     'membre': request.session.get('membres')
                 })
 
+            actualite = Actualite(
+                auteur=auteur,
+                titre=titre,
+                contenue=contenue,
+            )
+
+            actualite.save()
 
             if 'image' in request.FILES:
                 
                 chemin_image = inserer_photo(request,nom_image)
-                actualite = Actualite(
-                    auteur=auteur,
-                    titre=titre,
-                    contenue=contenue,
-                    image=chemin_image
-                )
-
-                actualite.save()
+                for i, chemin_image in enumerate(request.FILES.getlist('images')):
+                    ImageActualite.objects.create(
+                        actualite=actualite,
+                        image=inserer_photo(request,chemin_image),
+                        ordre=i
+                    )
                 messages.success(request, "Actualité créée avec succès !")
                 return redirect('actualite')
 
@@ -83,6 +90,61 @@ def creer_actualite(request):
     return render(request, 'ActualiteCreer.html', {
         'membre': request.session.get('membres')
     })
+
+# \\\\\\\\\\ Actualiter Creer avec lien /////
+def creer_actualite_liee(request,type_objet,objet_id):
+    if not request.session.get('membres', {}).get('role') in ['admin', 'moderateur','membre']:
+        messages.error(request, "Vous n'avez pas les droits pour publier une actualité")
+        return redirect('accueil')
+    
+    if type_objet == 'evenement':
+        objet = get_object_or_404(Evenement, id=objet_id)
+        template_lien = f"<a href='{reverse('detail_evenement', args=[objet.id])}' class='badge bg-info'>Événement: {objet.titre}</a>"
+    elif type_objet == 'activite':
+        objet = get_object_or_404(Activite, id=objet_id)
+        template_lien = f"<a href='{reverse('detail_activite', args=[objet.id])}' class='badge bg-success'>Activité: {objet.nom}</a>"
+    else:
+        messages.error(request, "Type d'objet inconnu")
+        return redirect('accueil')
+    
+    if request.method == 'POST':
+        try:
+            auteur = Utilisateur.objects.get(id=request.session['membres']['id'])
+            actualite = Actualite(
+                titre=request.POST.get('titre'),
+                contenue=f"{request.POST.get('contenue')}<br><br>{template_lien}",
+                auteur=auteur,
+                etat='publie'
+            )
+            if type_objet == 'evenement':
+                actualite.evenement = objet
+            else:
+                actualite.activite = objet
+            
+            actualite.save()
+
+            if 'image' in request.FILES:
+                for i, image in enumerate(request.FILES.getlist('images')):
+                    ImageActualite.objects.create(
+                        actualite=actualite,
+                        image=inserer_photo(request,image),
+                        ordre=i
+                    )
+            messages.success(request, "Actualité publiée avec succès !")
+            return redirect('detail_actualite', form_id=actualite.id)
+        except Exception as e:
+            messages.error(request, f"Erreur: {str(e)}")
+    
+    # Pré-remplir le titre avec le nom de l'événement/activité
+    titre_initial = f"Nouvelle actualité sur {objet.titre if type_objet == 'evenement' else objet.nom}"
+    
+    return render(request, 'actualites/CreerLiees.html', {
+        'type_objet': type_objet,
+        'objet_id': objet_id,
+        'titre_initial': titre_initial,
+        'objet': objet 
+    })
+
 
 
 def ajouter_commentaire(request, form_id):

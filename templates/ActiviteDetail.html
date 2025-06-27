@@ -63,6 +63,14 @@
                                     Participer à cet Activité
                                 </button>
                             {% endif %}
+
+                            <!-- Bouton Publier une actualité (visible seulement pour admin/moderateur) -->
+                            {% if peut_publier_actu %}
+                                <button type="submit" name="publier_actu" 
+                                        class="btn btn-success">
+                                    <i class="bi bi-megaphone"></i> Publier une actualité
+                                </button>
+                            {% endif %}
                         </form>
                     </div>
                     {% else %}

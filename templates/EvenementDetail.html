@@ -8,7 +8,7 @@
         <div class="col-lg-8 mx-auto">
             <div class="card shadow">
                 {% if evenement.image %}
-                <img src="{{ evenement.image.url }}" class="card-img-top" alt="{{ evenement.titre }}">
+                <img src="{{ evenement.image.url }}" class="card-img-top" alt="{{ evenement.titre }}" style="max-height: 400px; object-fit: cover;">
                 {% endif %}
                 
                 <div class="card-body">
@@ -33,7 +33,7 @@
                         {% if evenement.nombre_participant_max %}
                         <p class="text-muted">
                             <i class="bi bi-people"></i> 
-                            Places: {{ evenement.nombre_participants.count }}/{{ evenement.nombre_participant_max }}
+                            Places: {{ evenement.participants.count }}/{{ evenement.nombre_participant_max }}
                         </p>
                         {% endif %}
                     </div>
@@ -48,41 +48,54 @@
                         <div class="d-flex align-items-center">
                             {% if evenement.createur.photo %}
                             <img src="{{ evenement.createur.photo.url }}" 
-                                 class="rounded-circle me-3" width="50" alt="Organisateur">
+                                 class="rounded-circle me-3" width="50" height="50" 
+                                 style="object-fit: cover;" alt="{{ evenement.createur.get_full_name }}">
                             {% endif %}
                             <span>{{ evenement.createur.nom }} {{ evenement.createur.prenom }}</span>
                         </div>
                     </div>
                     
+                    <!-- Section Participation -->
                     {% if membre %}
-                    <div class="mt-4">
+                    <div class="mt-4 border-top pt-3">
                         <form method="post">
                             {% csrf_token %}
                             {% if est_inscrit %}
                             <button type="submit" name="action" value="annuler" 
-                                    class="btn btn-danger">
-                                Annuler ma participation
+                                    class="btn btn-danger me-2">
+                                <i class="bi bi-person-dash"></i> Annuler ma participation
                             </button>
                             {% else %}
                             <button type="submit" name="action" value="participer" 
-                                    class="btn btn-primary"
+                                    class="btn btn-primary me-2"
                                     {% if evenement.date_debut < maintenant %}disabled{% endif %}>
-                                Participer à cet événement
+                                <i class="bi bi-person-plus"></i> Participer
+                            </button>
+                            {% endif %}
+                            
+                            <!-- Bouton Publier une actualité (visible seulement pour admin/moderateur) -->
+                            {% if peut_publier_actu %}
+                            <button type="submit" name="publier_actu" 
+                                    class="btn btn-success">
+                                <i class="bi bi-megaphone"></i> Publier une actualité
                             </button>
                             {% endif %}
                         </form>
                     </div>
                     {% else %}
-                    <div class="alert alert-info">
+                    <div class="alert alert-info mt-4">
                         <a href="{% url 'connexion' %}" class="alert-link">Connectez-vous</a> 
                         pour participer à cet événement
                     </div>
                     {% endif %}
                 </div>
                 
-                <div class="card-footer">
-                    <small class="text-muted">
+                <div class="card-footer text-muted">
+                    <small>
                         Créé le {{ evenement.date_creation|date:"d/m/Y" }}
+                        {% if evenement.date_modification %}
+                        | Modifié le {{ evenement.date_modification|date:"d/m/Y" }}
+                        {% endif %}
                     </small>
                 </div>
             </div>
@@ -91,13 +104,18 @@
 </div>
 
 <style>
-    nav{
+    nav {
         z-index: 100;
     }
-    .marg{
+    .marg {
         margin-top: 2%;
     }
+    .card-img-top {
+        max-height: 400px;
+        object-fit: cover;
+    }
+    .rounded-circle {
+        object-fit: cover;
+    }
 </style>
-
-
 {% endblock %}

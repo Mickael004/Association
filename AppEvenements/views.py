@@ -58,38 +58,44 @@ def detail_evenement(request,form_id):
         ).exists()
 
     # Gestion participant
-    if request.method == 'POST' and 'action' in request.POST:
-        if request.session.get('membres'):
+    if request.method == 'POST':
+        if 'action' in request.POST:
+            if request.session.get('membres'):
 
-            utilisateur = Utilisateur.objects.get(id = request.session['membres']['id'])
+                utilisateur = Utilisateur.objects.get(id = request.session['membres']['id'])
 
-            if request.POST['action'] == 'participer' :
+                if request.POST['action'] == 'participer' :
 
-                if(evenement.nombre_participant_max and evenement.nombre_participants.count()>= evenement.nombre_participant_max):
-                    messages.error(request,"Desole l'evenement est complet")
+                    if(evenement.nombre_participant_max and evenement.nombre_participants.count()>= evenement.nombre_participant_max):
+                        messages.error(request,"Desole l'evenement est complet")
 
-                else:
-                    # evenement.nombre_participants.add(utilisateur)
-                    ParticipationEvenement.objects.get_or_create(
-                    evenement=evenement,
-                    participant=utilisateur
-                )
-                messages.success(request, "Vous êtes maintenant inscrit à cet événement")
+                    else:
+                        # evenement.nombre_participants.add(utilisateur)
+                        ParticipationEvenement.objects.get_or_create(
+                        evenement=evenement,
+                        participant=utilisateur
+                    )
+                    messages.success(request, "Vous êtes maintenant inscrit à cet événement")
+                
+                elif request.POST['action'] == 'annuler' :
+                    # evenement.nombre_participants.remove(utilisateur)
+
+                    ParticipationEvenement.objects.filter(
+                        evenement=evenement,
+                        participant=utilisateur
+                    ).delete()
+                    messages.success(request, "Votre participation a été annulée")
             
-            elif request.POST['action'] == 'annuler' :
-                # evenement.nombre_participants.remove(utilisateur)
+                return redirect('detail_evenement', form_id=form_id)
 
-                ParticipationEvenement.objects.filter(
-                    evenement=evenement,
-                    participant=utilisateur
-                ).delete()
-                messages.success(request, "Votre participation a été annulée")
-        
-            return redirect('detail_evenement', form_id=form_id)
-
-        else :
-            messages.error(request, "Vous devez être connecté pour participer")
-            return redirect('connexion')
+            else :
+                messages.error(request, "Vous devez être connecté pour participer")
+                return redirect('connexion')
+            
+        elif 'publier_actu' in request.POST and request.session.get('membres', {}).get('role') in ['admin', 'moderateur']:
+            return redirect('creer_actualite_liee',
+                            type_objet='evenement',
+                             objet_id=evenement.id)
     
 
     context = {
@@ -98,7 +104,8 @@ def detail_evenement(request,form_id):
         'badge_class': badge_class,
         'est_inscrit': est_inscrit,
         'maintenant': maintenant,
-        'membre': request.session.get('membres', {})
+        'membre': request.session.get('membres', {}),
+        'peut_publier_actu':request.session.get('membres', {}).get('role') in ['admin', 'moderateur']
     }
 
     return render(request, 'EvenementDetail.html', context)
@@ -201,6 +208,8 @@ def listActivites(request):
 
     return render(request,'Activite.html',context)
 
+
+
 def detail_activite(request,form_id):
     activites = get_object_or_404(Activite, id=form_id)
     maintenant = timezone.now().date()
@@ -227,35 +236,40 @@ def detail_activite(request,form_id):
         ).exists()
 
     # Gestion participant
-    if request.method == 'POST' and 'action' in request.POST:
-        if request.session.get('membres'):
+    if request.method == 'POST':
+        if 'action' in request.POST:
+            if request.session.get('membres'):
 
-            utilisateur = Utilisateur.objects.get(id = request.session['membres']['id'])
+                utilisateur = Utilisateur.objects.get(id = request.session['membres']['id'])
 
-            if request.POST['action'] == 'participer' :
+                if request.POST['action'] == 'participer' :
 
-                
-                    # evenement.nombre_participants.add(utilisateur)
-                ParticipationActivite.objects.get_or_create(
-                activite=activites,
-                participant=utilisateur
-                )
-                messages.success(request, "Vous êtes maintenant inscrit à cet activite")
-            
-            elif request.POST['action'] == 'annuler' :
-                # evenement.nombre_participants.remove(utilisateur)
-
-                ParticipationActivite.objects.filter(
-                    activites=activites,
+                    
+                        # evenement.nombre_participants.add(utilisateur)
+                    ParticipationActivite.objects.get_or_create(
+                    activite=activites,
                     participant=utilisateur
-                ).delete()
-                messages.success(request, "Votre participation a été annulée")
-        
-            return redirect('detail_activite', form_id=form_id)
+                    )
+                    messages.success(request, "Vous êtes maintenant inscrit à cet activite")
+                
+                elif request.POST['action'] == 'annuler' :
+                    # evenement.nombre_participants.remove(utilisateur)
 
-        else :
-            messages.error(request, "Vous devez être connecté pour participer")
-            return redirect('connexion')
+                    ParticipationActivite.objects.filter(
+                        activites=activites,
+                        participant=utilisateur
+                    ).delete()
+                    messages.success(request, "Votre participation a été annulée")
+            
+                return redirect('detail_activite', form_id=form_id)
+
+            else :
+                messages.error(request, "Vous devez être connecté pour participer")
+                return redirect('connexion')
+        elif 'publier_actu' in request.POST and request.session.get('membres', {}).get('role') in ['admin', 'moderateur']:
+            return redirect('creer_actualite_liee',
+                            type_objet= 'activites',
+                            objet_id= activites.id)
     
 
     context = {
@@ -264,7 +278,8 @@ def detail_activite(request,form_id):
         'badge_class': badge_class,
         'est_inscrit': est_inscrit,
         'maintenant': maintenant,
-        'membre': request.session.get('membres', {})
+        'membre': request.session.get('membres', {}),
+        'peut_publier_actu':request.session.get('membres', {}).get('role') in ['admin', 'moderateur']
     }
 
     return render(request, 'ActiviteDetail.html', context)

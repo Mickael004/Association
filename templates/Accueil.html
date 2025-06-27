@@ -18,7 +18,7 @@
         <div class="container">
             <h2 class="text-center mb-5">Nos dernières actualités</h2>
             <div class="row">
-                {% for actualite in actualites %}
+                {% comment %} {% for actualite in actualites %}
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             {% if actualite.image %}
@@ -34,7 +34,7 @@
                             </div>
                         </div>
                     </div>
-                {% endfor %} 
+                {% endfor %}  {% endcomment %}
             </div>
             <div class="text-center mt-4">
                 <a href="{% url 'actualite' %}" class="btn btn-primary">Voir toutes les actualités</a>
