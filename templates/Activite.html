@@ -60,7 +60,8 @@
                                 {% if activite.date_debut > aujourdhui %}bg-info
                                 {% elif activite.date_fin < aujourdhui %}bg-secondary
                                 {% else %}bg-success{% endif %}">
-                                {% if activite.date_activites > aujourdhui %}À venir
+                                {% if activite.date_activites > aujourdhui %}
+                                    {% if activite. %}{% endif %}À venir
                                 {% elif activite.date_activites < aujourdhui %}Terminé
                                 {% else %}En cours{% endif %}
                             </span>

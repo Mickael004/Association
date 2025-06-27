@@ -84,7 +84,7 @@
                 </div>
             </div>
             
-            <div class="mb-5">
+            {% comment %} <div class="mb-5">
                 <h2 class="text-center mb-4">Notre équipe</h2>
                 <div class="row">
                     {% for membre in equipe %}
@@ -106,6 +106,68 @@
                         </div>
                     {% endfor %}
                 </div>
+            </div> {% endcomment %}
+
+            <div class="text-center mb-5 marg">
+                <h1 class="display-5 fw-bold">Notre Équipe</h1>
+                <p class="lead text-muted">Découvrez les membres passionnés qui font vivre notre association</p>
+            </div>
+    
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for membre in equipe %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-light border-0 pt-3">
+                            {% if membre.membre.photo %}
+                            <img src="{{ membre.membre.photo.url }}" 
+                                class="rounded-circle mx-auto d-block object-fit-cover" 
+                                width="120" height="120" 
+                                alt="{{ membre.membre.get_full_name }}">
+                            {% else %}
+                            <div class="rounded-circle mx-auto d-block bg-secondary d-flex align-items-center justify-content-center" 
+                                style="width: 120px; height: 120px;">
+                                <i class="bi bi-person text-white" style="font-size: 3rem;"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-body text-center pt-0">
+                            <h3 class="h5 card-title mb-1">{{ membre.membre.prenom }} {{ membre.membre.nom }}</h3>
+                            <span class="badge bg-primary rounded-pill mb-2">{{ membre.role }}</span>
+                            
+                            <ul class="list-unstyled mt-3 mb-0">
+                                <li class="mb-1">
+                                    <i class="bi bi-envelope-fill text-primary me-2"></i>
+                                    <a href="mailto:{{ membre.membre.email }}" class="text-decoration-none">{{ membre.membre.email }}</a>
+                                </li>
+                                <li class="mb-1">
+                                    <i class="bi bi-telephone-fill text-primary me-2"></i>
+                                    {{ membre.membre.telephone|default:"Non renseigné" }}
+                                </li>
+                                {% if membre.date_ajout %}
+                                <li class="small text-muted mt-2">
+                                    <i class="bi bi-calendar-check me-1"></i>
+                                    Membre depuis {{ membre.date_ajout|date:"F Y" }}
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        
+                        {% comment %} <div class="card-footer bg-white border-0 text-center pb-3">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="#" class="btn btn-sm btn-outline-primary rounded-circle"
+                                data-bs-toggle="tooltip" data-bs-title="Envoyer un message">
+                                    <i class="bi bi-chat-dots"></i>
+                                </a>
+                                <a href="#" class="btn btn-sm btn-outline-secondary rounded-circle"
+                                data-bs-toggle="tooltip" data-bs-title="Voir le profil">
+                                    <i class="bi bi-person-lines-fill"></i>
+                                </a>
+                            </div>
+                        </div> {% endcomment %}
+                    </div>
+                </div>
+                {% endfor %}
             </div>
             
             <div class="mb-5">

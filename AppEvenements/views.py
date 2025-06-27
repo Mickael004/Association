@@ -180,7 +180,8 @@ def creer_evenement(request):
 def listActivites(request):
     filtre = request.GET.get('filtre','tout')
 
-    aujourdhui = timezone.now()
+    aujourdhui = timezone.now().date()
+    heureauj = timezone.now().time()
     activites = Activite.objects.all()
 
     if filtre == 'prochainement':
@@ -194,7 +195,8 @@ def listActivites(request):
     context = {
         'activites':activites,
         'filtre_actif':filtre,
-        'aujourdhui':aujourdhui
+        'aujourdhui':aujourdhui,
+        'heureauj':heureauj
     }
 
     return render(request,'Activite.html',context)
