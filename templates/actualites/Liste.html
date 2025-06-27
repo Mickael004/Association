@@ -1,0 +1,224 @@
+{% extends 'layouts/master.html' %}
+{% load static %}
+
+{% block title %}Actualités - Youth{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4 text-center marg">Actualités</h2>
+    
+    {% if request.session.membres.role in 'admin moderateur membre' %}
+        <div class="btn-ajout">
+            <a href="{% url 'creer_actualite' %}" class="btn btn-primary rounded-pill shadow">
+                <i class="bi bi-plus-lg"></i> Nouvelle actualité
+            </a>
+        </div>
+    {% endif %}
+
+    {% if messages %}
+    <div class="alert alert-danger">
+        {% for message in messages %}
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Filtres pour staff -->
+    {% if is_staff %}
+    <div class="mb-4 text-center">
+        <div class="btn-group" role="group">
+            <a href="?filter=publie" class="btn btn-sm {% if filtre_etat == 'publie' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                Publiées
+            </a>
+            <a href="?filter=en_attente" class="btn btn-sm {% if filtre_etat == 'en_attente' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                En attente
+            </a>
+            <a href="?filter=brouillon" class="btn btn-sm {% if filtre_etat == 'brouillon' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+                Brouillons
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="list-group largeur">
+        {% for actualite in actualites %}
+        <div class="list-group-item mb-3 rounded shadow-sm">
+            <!-- Badge d'état pour staff -->
+            {% if staff %}
+            <div class="mb-2">
+                <span class="badge 
+                    {% if actualite.etat == 'publie' %}bg-success
+                    {% elif actualite.etat == 'en_attente' %}bg-warning text-dark
+                    {% else %}bg-secondary{% endif %}">
+                    {{ actualite.etat }}
+                </span>
+                
+                {% if actualite.etat == 'en_attente' and staff %}
+                <a href="{% url 'valider_publication' actualite.id %}" class="btn btn-sm btn-success ms-2">
+                    <i class="bi bi-check-lg"></i> Valider
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-person"></i> {{ actualite.auteur.nom }} {{ actualite.auteur.prenom }}
+                        <i class="bi bi-calendar ms-2"></i> {{ actualite.date_publication|date:"d/m/Y H:i" }}
+                    </p>
+                </div>
+            </div>
+
+            {% if actualite.images.all %}
+            <div class="row g-2 mb-3">
+                {% for image in actualite.images.all|slice:":3" %}
+                <div class="col-md-4">
+                    <img src="{{ image.image.url }}" class="img-fluid rounded" alt="{{ actualite.titre }}">
+                </div>
+                {% endfor %}
+                {% if actualite.iages.count > 3  %}
+                    <div class="col-md-4 position-relative" >
+                        <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="height: 100%; min-height: 200px;">
+                            <span class="text-white fw-bold" >{{actualite.images.count}}</span>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <h2 class="h5 mb-1">{{ actualite.titre }}</h2>
+            <div class="mt-2 mb-3">
+                {{ actualite.contenue|safe|linebreaks }}
+            </div>
+            
+            <button class="btn btn-link text-primary p-0" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#commentairesModal"
+                    onclick="loadComments({{ actualite.id }})">
+                <i class="bi bi-chat-left-text"></i> Commentaires
+            </button>
+
+            {% if request.session.membres %}
+            <form method="post" action="{% url 'ajouter_commentaire' actualite.id %}" class="mt-3">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" name="message" class="form-control" placeholder="Ajouter un commentaire..." required>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-send"></i> Envoyer
+                    </button>
+                </div>
+            </form>
+            {% else %}
+            <div class="alert alert-info mt-3 py-2">
+                <a href="{% url 'connexionPage' %}" class="alert-link">Connectez-vous</a> pour commenter
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="alert alert-info">Aucune actualité disponible pour le moment.</div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if actualites.paginator.num_pages > 1 %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if actualites.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ actualites.previous_page_number }}{% if current_filter %}&filter={{ current_filter }}{% endif %}">
+                    Précédent
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for num in actualites.paginator.page_range %}
+            <li class="page-item {% if num == actualites.number %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}{% if current_filter %}&filter={{ current_filter }}{% endif %}">
+                    {{ num }}
+                </a>
+            </li>
+            {% endfor %}
+            
+            {% if actualites.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ actualites.next_page_number }}{% if current_filter %}&filter={{ current_filter }}{% endif %}">
+                    Suivant
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Modal Commentaires -->
+<div class="modal fade" id="commentairesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">Tous les Commentaires</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="commentairesContainer">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    nav { z-index: 100; }
+    .marg { margin-top: 2%; }
+    
+    .btn-ajout {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 1000;
+    }
+    
+    .largeur {
+        width: 70%;
+        margin: auto;
+    }
+    
+    @media (max-width: 992px) {
+        .largeur {
+            width: 90%;
+        }
+        .btn-ajout {
+            right: 10px;
+            bottom: 10px;
+        }
+    }
+    
+    .badge.bg-warning {
+        color: #000 !important;
+    }
+</style>
+
+<script>
+function loadComments(actualiteId) {
+    fetch(`/actualites/${actualiteId}/commentaires/`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('commentairesContainer').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('commentairesContainer').innerHTML = `
+                <div class="alert alert-danger">
+                    Erreur lors du chargement des commentaires
+                </div>
+            `;
+        });
+}
+</script>
+{% endblock %}

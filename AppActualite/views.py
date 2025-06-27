@@ -5,6 +5,9 @@ from django.utils import timezone,timesince
 from AppMembre.models import Utilisateur
 from AppEvenements.models import Evenement,Activite
 from django.urls import reverse
+from django.core.paginator import Paginator
+from django.db.models import Q, Prefetch
+
 
 import os
 from django.conf import settings
@@ -12,9 +15,58 @@ from django.core.files.storage import default_storage
 # Create your views here.
 
 def listActualite(request):
-    actualites = Actualite.objects.all().order_by('-date_publication')
+    # actualites = Actualite.objects.all().order_by('-date_publication')
 
-    return render(request,'Actualite.html',{'actualites':actualites})
+    # return render(request,'Actualite.html',{'actualites':actualites})
+
+    staff = request.session.get('membres', {}).get('role') in ['admin', 'moderateur']
+
+    filtre_etat = request.GET.get('filter','publie')
+
+    actualites = Actualite.objects.all().prefetch_related(
+        Prefetch('images',queryset=ImageActualite.objects.order_by('ordre'))
+    )
+
+
+    if staff:
+        if filtre_etat == 'publie':
+            actualites = actualites.filter(etat='publie')
+
+        elif filtre_etat == 'en_attente':
+            actualites = actualites.filter(etat='en_attente')
+        elif filtre_etat == 'brouillon':
+            actualites = actualites.filter(etat='brouillon')
+    else:
+        # Pour les membres normaux, ne montrer que les publiés
+        actualites = actualites.filter(etat='publie')
+
+    # Pagination
+    pagination = Paginator(actualites, 10)
+    page_number = request.GET.get('page')
+    page_obj = pagination.get_page(page_number)
+
+    context = {
+        'actualites': page_obj,
+        'staff': staff,
+        'filtre_etat': filtre_etat,
+    }
+
+    return render(request, 'actualites/Liste.html', context)
+
+
+# ///////:Validation
+def valider_publication(request, form_id):
+    if request.session.get('membres', {}).get('role') not in ['admin', 'moderateur']:
+        messages.error(request, "Vous n'avez pas les droits pour valider des publications")
+        return redirect('liste_actualites')
+    
+    actualite = get_object_or_404(Actualite, id=form_id)
+    actualite.etat = 'publie'
+    actualite.save()
+    
+    messages.success(request, "L'actualité a été publiée avec succès!")
+    return redirect('liste_actualites')
+
 
 
 def inserer_photo(request, titre):
@@ -169,7 +221,6 @@ def creer_actualite_liee(request, type_objet=None, objet_id=None):
         context['evenements'] = Evenement.objects.filter(date_debut__gte=timezone.now())
         context['activites'] = Activite.objects.filter(date_organisation__gte=timezone.now())
     return render(request, 'actualites/CreerLiees.html',context)
-
 
 
 
