@@ -211,11 +211,11 @@ def listActivites(request):
 
 
 def detail_activite(request,form_id):
-    activites = get_object_or_404(Activite, id=form_id)
+    activite = get_object_or_404(Activite, id=form_id)
     maintenant = timezone.now().date()
 
     # status
-    if activites.date_activites > maintenant:
+    if activite.date_activites > maintenant:
         statut = "À venir"
         badge_class = "bg-info"
     # elif activite.date_fin < maintenant:
@@ -231,7 +231,7 @@ def detail_activite(request,form_id):
     est_inscrit = False
     if request.session.get('membres'):
         est_inscrit = ParticipationActivite.objects.filter(
-            activite = activites,
+            activite = activite,
             id = request.session['membres']['id']
         ).exists()
 
@@ -247,7 +247,7 @@ def detail_activite(request,form_id):
                     
                         # evenement.nombre_participants.add(utilisateur)
                     ParticipationActivite.objects.get_or_create(
-                    activite=activites,
+                    activite=activite,
                     participant=utilisateur
                     )
                     messages.success(request, "Vous êtes maintenant inscrit à cet activite")
@@ -256,7 +256,7 @@ def detail_activite(request,form_id):
                     # evenement.nombre_participants.remove(utilisateur)
 
                     ParticipationActivite.objects.filter(
-                        activites=activites,
+                        activite=activite,
                         participant=utilisateur
                     ).delete()
                     messages.success(request, "Votre participation a été annulée")
@@ -266,14 +266,15 @@ def detail_activite(request,form_id):
             else :
                 messages.error(request, "Vous devez être connecté pour participer")
                 return redirect('connexion')
+            
         elif 'publier_actu' in request.POST and request.session.get('membres', {}).get('role') in ['admin', 'moderateur']:
             return redirect('creer_actualite_liee',
-                            type_objet= 'activites',
-                            objet_id= activites.id)
+                            type_objet='activite',
+                            objet_id= activite.id)
     
 
     context = {
-        'activites': activites,
+        'activite': activite,
         'statut': statut,
         'badge_class': badge_class,
         'est_inscrit': est_inscrit,

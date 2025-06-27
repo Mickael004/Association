@@ -1,4 +1,147 @@
+
 {% extends 'layouts/master.html' %}
+{% load static %}
+
+{% block title %}
+    {% if type_objet %}Actualité Liée{% else %}Nouvelle Actualité{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center marg">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="text-center">
+                        <i class="bi bi-megaphone me-2"></i>
+                        {% if type_objet == 'evenement' %}
+                            Ajouter Actualité sur l'événement
+                        {% elif type_objet == 'activite' %}
+                            Ajouter Actualité sur l'activité
+                        {% else %}
+                            Créer une nouvelle actualité
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        <div class="alert alert-danger">
+                            {% for message in messages %}
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if type_objet %}
+                            <div class="alert alert-info mb-4">
+                                <h5 class="alert-heading">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    {% if type_objet == 'evenement' %}
+                                        Événement associé : {{ objet.titre }}
+                                    {% else %}
+                                        Activité associée : {{ objet.nom }}
+                                    {% endif %}
+                                </h5>
+                            </div>
+                        {% else %}
+                            <div class="mb-3">
+                                <label class="form-label">Associer à un événement</label>
+                                <select name="evenement" class="form-select">
+                                    <option value="">Aucun événement</option>
+                                    {% for evenement in evenements %}
+                                        <option value="{{ evenement.id }}">{{ evenement.titre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Associer à une activité</label>
+                                <select name="activite" class="form-select">
+                                    <option value="">Aucune activité</option>
+                                    {% for activite in activites %}
+                                        <option value="{{ activite.id }}">{{ activite.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="titre" class="form-label">Titre </label>
+                            <input type="text" class="form-control" id="titre" name="titre" 
+                                   value="{{ titre_initial }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contenue" class="form-label">Contenu </label>
+                            <textarea class="form-control" id="contenue" name="contenue" 
+                                      rows="8" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="images" class="form-label">Images d'illustration</label>
+                            <input type="file" class="form-control" id="images" name="images"
+                                   accept="image/jpeg, image/png" multiple>
+                            <div class="form-text">
+                                Formats acceptés : JPG, PNG. Vous pouvez sélectionner plusieurs fichiers.
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            {% if type_objet %}
+                                <a href="{% if type_objet == 'evenement' %}{% url 'detail_evenement' objet_id %}{% else %}{% url 'detail_activite' objet_id %}{% endif %}" 
+                                   class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i> Retour
+                                </a>
+                            {% else %}
+                                <a href="{% url 'liste_actualites' %}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i> Annuler
+                                </a>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-send-check me-1"></i> 
+                                {% if type_objet %}Publier{% else %}Soumettre{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    nav { z-index: 100; }
+    .marg { margin-top: 2%; }
+    .card { border-radius: 0.5rem; }
+    .card-header { border-radius: 0.5rem 0.5rem 0 0 !important; }
+    textarea.form-control { min-height: 200px; }
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+</style>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'layouts/master.html' %}
 {% load static %}
 
 {% block title %}Nouvelle Actualité Liée{% endblock %}
@@ -109,4 +252,4 @@
         color: #0c5460;
     }
 </style>
-{% endblock %}
+{% endblock %} {% endcomment %}
