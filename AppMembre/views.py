@@ -242,3 +242,54 @@ def modif_mot_passe(request):
         return redirect('profil')
     return redirect('profil')
             
+
+
+
+
+# //////////////Cotisation
+
+def ajouter_cotisation(request):
+    if request.session.get('membres', {}).get('role')  in ['admin', 'moderateur']:
+        if request.method == 'POST':
+            try:
+                utilisateur = Utilisateur.objects.get(id=request.session['membres']['id'])
+
+                montant = request.POST.get('montant')
+                periode = request.POST.get('periode')
+                date_limite = request.POST.get('date_limite')
+                
+                cotisation = Cotisation(
+                    utilisateur=utilisateur,
+                    montant=montant,
+                    periode=periode,
+                    date_limite_paiement=date_limite,
+                    statut='non_paye'
+                )
+                cotisation.save()
+                
+                messages.success(request, "Cotisation ajoutée avec succès!")
+                return redirect('liste_cotisations')
+            
+            except Exception as e:
+                messages.error(request, f"Erreur: {str(e)}")
+        # Liste des membres pour le select
+    membres = Utilisateur.objects.all().order_by('nom', 'prenom')
+    return render(request, 'cotisation/Ajouter.html', {'membres': membres})
+
+
+def liste_cotisations(request):
+    cotisations = Cotisation.objects.all().select_related('utilisateur').order_by('-periode')
+    # Filtres
+    membre_id = request.GET.get('membre')
+    statut = request.GET.get('statut')
+    
+    if membre_id:
+        cotisations = cotisations.filter(utilisateur_id=membre_id)
+    if statut:
+        cotisations = cotisations.filter(statut=statut)
+    
+    context = {
+        'cotisations': cotisations,
+        'membres': Utilisateur.objects.all().order_by('nom'),
+    }
+    return render(request, 'cotisation/Liste.html', context)

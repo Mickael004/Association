@@ -49,26 +49,7 @@
                                     {% endif %}
                                 </h5>
                             </div>
-                        {% else %}
-                            <div class="mb-3">
-                                <label class="form-label">Associer à un événement</label>
-                                <select name="evenement" class="form-select">
-                                    <option value="">Aucun événement</option>
-                                    {% for evenement in evenements %}
-                                        <option value="{{ evenement.id }}">{{ evenement.titre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
                             
-                            <div class="mb-3">
-                                <label class="form-label">Associer à une activité</label>
-                                <select name="activite" class="form-select">
-                                    <option value="">Aucune activité</option>
-                                    {% for activite in activites %}
-                                        <option value="{{ activite.id }}">{{ activite.nom }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
                         {% endif %}
                         
                         <div class="mb-3">
@@ -99,7 +80,7 @@
                                     <i class="bi bi-arrow-left me-1"></i> Retour
                                 </a>
                             {% else %}
-                                <a href="{% url 'liste_actualites' %}" class="btn btn-secondary">
+                                <a href="{% url 'actualite' %}" class="btn btn-secondary">
                                     <i class="bi bi-arrow-left me-1"></i> Annuler
                                 </a>
                             {% endif %}

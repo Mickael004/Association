@@ -14,12 +14,11 @@ urlpatterns = [
     path('profil/', profil, name='profil'),
     path('modification_profil',updateProfile, name='updateProfile'),
     path('modification_password',modif_mot_passe,name='modif_mot_passe'),
-    # path('profil/modifier/', views.edit_profil, name='edit_profil'),
-    # path('profil/mot-de-passe/', views.change_password, name='change_password'),
+
+
+    path('cotisations/ajouter/', ajouter_cotisation, name='ajouter_cotisation'),
+    path('cotisations/', liste_cotisations, name='liste_cotisations'),
+
     
-    # Admin
-    # path('membres/', views.liste_membres, name='liste_membres'),
-    # path('membres/<int:pk>/', views.detail_membre, name='detail_membre'),
-    # path('membres/<int:pk>/modifier/', views.edit_membre, name='edit_membre'),
-    # path('membres/<int:pk>/cotisations/', views.gestion_cotisations, name='gestion_cotisations'),
+    # path('membres/<int:pk>/cotisations/',gestion_cotisations, name='gestion_cotisations'),
 ]

@@ -219,7 +219,7 @@ def creer_actualite_liee(request, type_objet=None, objet_id=None):
     # Ajout des listes pour le formulaire libre
     if not type_objet:
         context['evenements'] = Evenement.objects.filter(date_debut__gte=timezone.now())
-        context['activites'] = Activite.objects.filter(date_organisation__gte=timezone.now())
+        context['activites'] = Activite.objects.filter(date_activites=timezone.now())
     return render(request, 'actualites/CreerLiees.html',context)
 
 

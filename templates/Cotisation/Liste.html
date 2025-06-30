@@ -1,0 +1,111 @@
+{% extends 'layouts/master.html' %}
+
+{% block title %}Gestion des Cotisations{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 marg">
+        <h2>
+            <i class="bi bi-currency-euro"></i> Gestion des cotisations
+        </h2>
+        <a href="{% url 'ajouter_cotisation' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Ajouter
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-light">
+            <div class="row">
+                <div class="col-md-5">
+                    <form class="row g-2">
+                        <div class="col-md-8">
+                            <select name="membre" class="form-select">
+                                <option value="">Tous les membres</option>
+                                {% for membre in membres %}
+                                <option value="{{ membre.id }}" {% if request.GET.membre == membre.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ membre.nom }} {{ membre.prenom }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-funnel"></i> Filtrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-5">
+                    <form class="row g-2">
+                        <div class="col-md-8">
+                            <select name="statut" class="form-select">
+                                <option value="">Tous les statuts</option>
+                                <option value="paye" {% if request.GET.statut == 'paye' %}selected{% endif %}>Payé</option>
+                                <option value="non_paye" {% if request.GET.statut == 'non_paye' %}selected{% endif %}>Non payé</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-funnel"></i> Filtrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Membre</th>
+                            <th>Période</th>
+                            <th>Montant</th>
+                            <th>Date limite</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cotisation in cotisations %}
+                        <tr>
+                            <td>{{ cotisation.utilisateur.nom }} {{ cotisation.utilisateur.prenom }}</td>
+                            <td>{{ cotisation.periode }}</td>
+                            <td>{{ cotisation.montant }} Ar</td>
+                            <td>{{ cotisation.date_limite_paiement|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="badge bg-{% if cotisation.statut == 'paye' %}success{% else %}danger{% endif %}">
+                                    {{ cotisation.get_statut_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucune cotisation trouvée</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    nav{
+        z-index: 1;
+    }
+    .marg{
+        margin-top: 2%;
+    }
+
+</style>
+{% endblock %}
