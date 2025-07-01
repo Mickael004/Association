@@ -177,7 +177,7 @@ def creer_actualite_liee(request, type_objet=None, objet_id=None):
                 titre=request.POST.get('titre'),
                 contenue=f"{request.POST.get('contenue')}<br><br>{template_lien}" if template_lien else request.POST.get('contenue'),
                 auteur=auteur,
-                etat='publie' if not (request.POST.get('evenement') or request.POST.get('activite')) else 'en_attente'
+                etat='publie' if (request.POST.get('evenement') or request.POST.get('activite')) else 'en_attente'
             )
             
             # Liaison avec l'événement/activité

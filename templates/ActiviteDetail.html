@@ -39,7 +39,7 @@
                         <div class="d-flex align-items-center">
                             {% if activites.createur.photo %}
                             <img src="{{ activites.createur.photo.url }}" 
-                                 class="rounded-circle me-3" width="50"
+                                 class="rounded-circle me-3" width="50" height="50"
                                  >
                             {% endif %}
                             <span>{{ activites.createur.nom }} {{ activites.createur.prenom }}</span>
@@ -75,7 +75,7 @@
                     </div>
                     {% else %}
                     <div class="alert alert-info">
-                        <a href="{% url 'connexion' %}" class="alert-link">Connectez-vous</a> 
+                        <a href="{% url 'connexionPage' %}" class="alert-link">Connectez-vous</a> 
                         pour participer à cet activité
                     </div>
                     {% endif %}

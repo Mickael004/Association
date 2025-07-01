@@ -218,9 +218,6 @@ def detail_activite(request,form_id):
     if activite.date_activites > maintenant:
         statut = "À venir"
         badge_class = "bg-info"
-    # elif activite.date_fin < maintenant:
-    #     statut = "Terminé"
-    #     badge_class = "bg-secondary"
     else:
         statut = "Terminé"
         badge_class = "bg-secondary"
@@ -274,7 +271,7 @@ def detail_activite(request,form_id):
     
 
     context = {
-        'activite': activite,
+        'activites': activite,
         'statut': statut,
         'badge_class': badge_class,
         'est_inscrit': est_inscrit,
