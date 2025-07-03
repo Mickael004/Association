@@ -40,22 +40,5 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'Utilisateurs',
             },
         ),
-        migrations.CreateModel(
-            name='Cotisation',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('montant', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('periode', models.CharField(max_length=50)),
-                ('date_limite_paiement', models.DateField()),
-                ('date_paiement', models.DateField(auto_now_add=True)),
-                ('reference_paiement', models.CharField(blank=True, max_length=100, null=True)),
-                ('statut', models.CharField(choices=[('paye', 'Payé'), ('non_paye', 'Non payé')], default='non_paye', max_length=20)),
-                ('utilisateur', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='AppMembre.utilisateur')),
-            ],
-            options={
-                'verbose_name': 'Cotisation',
-                'verbose_name_plural': 'Cotisations',
-                'ordering': ['-periode', 'utilisateur'],
-            },
-        ),
+        
     ]

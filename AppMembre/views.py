@@ -1,15 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
-from django.contrib.auth.hashers import check_password, make_password
 from django.contrib import messages
 from .models import *
-# from .form import *
 import re #regex
 from datetime import datetime
 import hashlib
 from django.contrib.auth import logout
 import os
 from django.conf import settings
+from django.utils import timezone
 from django.core.files.storage import default_storage
 # Create your views here.
 
@@ -155,16 +154,21 @@ def deconnexion(request):
 def profil(request):
     if request.session.get('membres'):
         membre_session = request.session['membres']
-        cotisation = Cotisation.objects.filter(utilisateur_id = membre_session.get('id')).order_by('-periode')
 
-        print ('Session: ',membre_session)
-        return render(request,'Profil.html',{
+        membre = Utilisateur.objects.get(id= request.session['membres']['id'])
+        aujourdhuit = timezone.now().date()
+        cotisations = Cotisation.objects.filter(statut='active').order_by('-date_debut')
+        paiements = Paiement.objects.filter(membre=membre)
+        return render(request, 'Profil.html', {
+            'cotisations': cotisations,
+            'paiements': paiements,
             'membre':membre_session,
-            'cotisation':cotisation,
             'MEDIA_URL':settings.MEDIA_URL
         })
     else:
         return redirect('accueil')
+    
+
 
 def updateProfile(request):
     if request.session.get('membres') and request.method == 'POST':
@@ -248,48 +252,171 @@ def modif_mot_passe(request):
 
 # //////////////Cotisation
 
-def ajouter_cotisation(request):
-    if request.session.get('membres', {}).get('role')  in ['admin', 'moderateur']:
+def inserer_photo_preuve(request, titre):
+    if 'image' in request.FILES:
+        image = request.FILES['image']
+        nom_fichier = f"{titre.replace(' ', '_')}_{image.name}.jpg"
+        chemin_relatif = os.path.join('images/cotisations', nom_fichier)
+        
+        
+        chemin_absolu = os.path.join(settings.MEDIA_ROOT, 'images/cotisations', nom_fichier)
+        
+        
+        os.makedirs(os.path.dirname(chemin_absolu), exist_ok=True)
+        
+        
+        with default_storage.open(chemin_absolu, 'wb+') as destination:
+            for chunk in image.chunks():
+                destination.write(chunk)
+        
+        return chemin_relatif 
+     
+# def listeCotisation(request):
+#     if request.session.get('membres'):
+#         membre = Utilisateur.objects.get(id= request.session['membres']['id'])
+#         aujourdhuit = timezone.now().date()
+#         cotisations = Cotisation.objects.filter(statut='active',date_fin__gte=aujourdhuit)
+#         paiements = Paiement.objects.filter(membre=membre)
+#         return render(request, 'cotisations/liste.html', {
+#             'cotisations': cotisations,
+#             'paiements': paiements
+#         })
+#     else:
+#         return redirect('accueil')
+
+
+def payerCotisation(request,cotisation_id):
+
+    if request.session.get('membres'):
+        cotisation = get_object_or_404(Cotisation,id=cotisation_id)
+        membre = Utilisateur.objects.get(id= request.session['membres']['id'])
+
         if request.method == 'POST':
             try:
-                utilisateur = Utilisateur.objects.get(id=request.session['membres']['id'])
+                methode_paiement = request.POST.get('methode_paiement')
+                numero_compte = request.POST.get('numero_compte')
+                notes = request.POST.get('notes')
+                nom_image = f"{membre.nom}_{cotisation.titre}"
 
-                montant = request.POST.get('montant')
-                periode = request.POST.get('periode')
-                date_limite = request.POST.get('date_limite')
-                
-                cotisation = Cotisation(
-                    utilisateur=utilisateur,
-                    montant=montant,
-                    periode=periode,
-                    date_limite_paiement=date_limite,
-                    statut='non_paye'
+                paiement = Paiement(
+                    membre = membre,
+                    cotisation = cotisation,
+                    montant=cotisation.montant,
+                    methode_paiement = methode_paiement,
+                    numero_compte=numero_compte,
+                    notes = notes,
+                    statut = 'en_attent'
                 )
-                cotisation.save()
+                if 'preuve_paiement' in request.FILES:
+                    chemin_preuve = inserer_photo_preuve(request,nom_image)
+                    paiement.preuve_paiement=chemin_preuve,
                 
-                messages.success(request, "Cotisation ajoutée avec succès!")
-                return redirect('liste_cotisations')
-            
+                paiement.save()
+                messages.success(request, "Votre paiement a été enregistré et est en attente de validation.")
+                return redirect('profil')    
             except Exception as e:
                 messages.error(request, f"Erreur: {str(e)}")
-        # Liste des membres pour le select
-    membres = Utilisateur.objects.all().order_by('nom', 'prenom')
-    return render(request, 'cotisation/Ajouter.html', {'membres': membres})
+                print(f"Erreur: {str(e)}")
+        
+        return render(request, 'cotisations/payer.html', {'cotisation': cotisation})
+    
+    else:
+        return redirect('accueil')
+    
+
+def historiquePaiements(request):
+    if request.session.get('membres'):
+        membre = Utilisateur.objects.get(id= request.session['membres']['id'])
+        paiement = Paiement.objects.filter(membre=membre).order_by('-date_paiement')
+
+        return render(request, 'cotisations/historique.html', {'paiements': paiement,'membre':membre})
+    else:
+        return redirect('accueil')
 
 
-def liste_cotisations(request):
-    cotisations = Cotisation.objects.all().select_related('utilisateur').order_by('-periode')
-    # Filtres
-    membre_id = request.GET.get('membre')
-    statut = request.GET.get('statut')
+
+def gestionCotisation(request):
+    if request.session.get('membres',{}).get('role') in ['admin','moderateur']:
+
+        filtre=request.GET.get('filtre','cotisations')
+        cotisations = Cotisation.objects.all().order_by('-date_debut')
+
+        context = {
+            'filtre_actif':filtre,
+            'cotisations' :cotisations,
+            # 'paiements':paiements
+        }
+        if filtre == 'en_attente':
+            context['paiements'] = Paiement.objects.filter(statut='en_attent').order_by('-date_paiement')
+        elif filtre == 'valides':
+            context['paiements']=Paiement.objects.filter(statut='valide').order_by('-date_paiement')
+        elif filtre == 'refuses':
+            context['paiements'] =  Paiement.objects.filter(statut='refuse').order_by('-date_paiement')
+        else :
+            context['cotisations'] = Cotisation.objects.all().order_by('-date_debut')
+
+        return render(request, 'cotisations/Adminliste.html', context)
+    else:
+        return redirect('accueil')
+
+def creerCotisations(request):
+    if request.session.get('membres',{}).get('role') in ['admin','moderateur']:
+        
+        if request.method == 'POST': 
+            titre=request.POST.get('titre')
+            description=request.POST.get('description')
+            montant=request.POST.get('montant')
+            type_cotisation=request.POST.get('type_cotisation')
+            date_debut=request.POST.get('date_debut')
+            date_fin=request.POST.get('date_fin') or None
+            statut=request.POST.get('statut', 'active')
+            try:
+                cotisation = Cotisation(
+                    titre=titre,
+                    description=description,
+                    montant=montant,
+                    type_cotisation=type_cotisation,
+                    date_debut=date_debut,
+                    date_fin=date_fin,
+                    statut=statut
+                )
+                cotisation.save()
+                messages.success(request, "Cotisation créée avec succès")
+                return redirect('gestion_cotisation')
+            except Exception as e:
+                messages.error(request, f"Erreur: {str(e)}")
+        return render(request, 'cotisations/creer.html')
+    else:
+        return redirect('accueil')
     
-    if membre_id:
-        cotisations = cotisations.filter(utilisateur_id=membre_id)
-    if statut:
-        cotisations = cotisations.filter(statut=statut)
     
-    context = {
-        'cotisations': cotisations,
-        'membres': Utilisateur.objects.all().order_by('nom'),
-    }
-    return render(request, 'cotisation/Liste.html', context)
+def valider_payements(request):
+    if request.session.get('membres',{}).get('role') in ['admin','moderateur']:
+
+        paiement = Paiement.objects.filter(statut='en_attente').order_by('date_paiement')
+
+        return render(request,'cotisations/validation.html',{'paiements':paiement})
+    
+    else:
+        return redirect('accueil')
+    
+def changer_statut_paiement(request,paiement_id):
+    if request.session.get('membres',{}).get('role') in ['admin','moderateur']:
+        paiements = get_object_or_404(Paiement,id=paiement_id)
+
+        if request.method == 'POST':
+            action = request.POST.get('action')
+            if action in ['valide','refuse','supprimer']:
+                if action == 'supprimer':
+                    paiements.delete()
+                    messages.success(request, "Paiement supprimé avec succès")
+                else:
+                    paiements.statut = action
+                    paiements.save()
+                    messages.success(request, f"Statut du paiement changé à {action}")
+        return redirect('gestion_cotisation')
+    else:
+        return redirect('accueil')
+
+
+

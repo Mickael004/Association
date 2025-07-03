@@ -63,35 +63,79 @@
                 
                 <div class="card mt-4">
                     <div class="card-header bg-primary text-white">
-                        <h4>Mes cotisations</h4>
+                        <h4>Mes Paiement cotisations</h4>
                     </div>
                     <div class="card-body">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Période</th>
+                                    <th>Date</th>
+                                    <th>Cotisation</th>
                                     <th>Montant</th>
+                                    <th>Méthode</th>
                                     <th>Statut</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for cotisation in cotisations %}
+                                {% for paiement in paiements%}
                                 <tr>
-                                    <td>{{ cotisation.periode }}</td>
-                                    <td>{{ cotisation.montant }} €</td>
+                                    <td>{{ paiement.date_paiement|date:"d/m/Y" }}</td>
+                                    <td>{{ paiement.cotisation.titre }}</td>
+                                    <td>{{ paiement.montant }}Ar</td>
+                                    <td>{{ paiement.get_methode_paiement_display }}</td>
                                     <td>
-                                        <span class="badge bg-{% if cotisation.statut == 'paye' %}success{% else %}danger{% endif %}">
-                                            {{ cotisation.get_statut_display }}
+                                        <span class="badge 
+                                            {% if paiement.statut == 'valide' %}bg-success
+                                            {% elif paiement.statut == 'refuse' %}bg-danger
+                                            {% else %}bg-warning{% endif %}">
+                                            {{ paiement.get_statut_display }}
                                         </span>
                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="3">Aucune cotisation enregistrée</td>
+                                    <td colspan="3" class="alert alert-info">Aucune paiement cotisation enregistrée</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+                <div class="card mt-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4>Cotisations à payer</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for cotisation in cotisations %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-header bg-primary text-white">
+                                        <h3>{{ cotisation.titre }}</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>{{ cotisation.description }}</p>
+                                        <ul class="list-unstyled">
+                                            <li><strong>Montant:</strong> {{ cotisation.montant }}Ar</li>
+                                            <li><strong>Type:</strong> {{ cotisation.type_cotisation }}</li>
+                                            <li><strong>Période:</strong> {{ cotisation.date_debut|date:"d/m/Y" }}
+                                                {% if cotisation.date_fin %} - {{ cotisation.date_fin|date:"d/m/Y" }}{% endif %}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-footer bg-white">
+                                        <a href="{% url 'payer_cotisation' cotisation.id %}" class="btn btn-primary">
+                                            Payer cette cotisation
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                                <div class="col-12">
+                                    <div class="alert alert-info">Aucune cotisation à payer actuellement.</div>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
