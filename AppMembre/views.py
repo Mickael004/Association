@@ -157,7 +157,18 @@ def profil(request):
 
         membre = Utilisateur.objects.get(id= request.session['membres']['id'])
         aujourdhuit = timezone.now().date()
-        cotisations = Cotisation.objects.filter(statut='active').order_by('-date_debut')
+        # cotisations = Cotisation.objects.filter(statut='active').order_by('-date_debut')
+        cotisations = []
+        for cotisation in Cotisation.objects.filter(statut='active').order_by('-date_debut'):
+            paiement = Paiement.objects.filter(
+                membre=membre,
+                cotisation=cotisation
+            ).first()
+            cotisations.append({
+                'cotisations': cotisation,
+                'paiement': paiement
+            })
+
         paiements = Paiement.objects.filter(membre=membre)
         return render(request, 'Profil.html', {
             'cotisations': cotisations,

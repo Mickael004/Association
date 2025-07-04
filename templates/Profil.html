@@ -111,22 +111,41 @@
                             <div class="col-md-4 mb-4">
                                 <div class="card h-100 shadow-sm">
                                     <div class="card-header bg-primary text-white">
-                                        <h3>{{ cotisation.titre }}</h3>
+                                        <h3>{{ cotisation.cotisations.titre }}</h3>
                                     </div>
                                     <div class="card-body">
-                                        <p>{{ cotisation.description }}</p>
+                                        <p>{{ cotisation.cotisations.description }}</p>
                                         <ul class="list-unstyled">
-                                            <li><strong>Montant:</strong> {{ cotisation.montant }}Ar</li>
-                                            <li><strong>Type:</strong> {{ cotisation.type_cotisation }}</li>
-                                            <li><strong>Période:</strong> {{ cotisation.date_debut|date:"d/m/Y" }}
-                                                {% if cotisation.date_fin %} - {{ cotisation.date_fin|date:"d/m/Y" }}{% endif %}
+                                            <li><strong>Montant:</strong> {{ cotisation.cotisations.montant }}Ar</li>
+                                            <li><strong>Type:</strong> {{ cotisation.cotisations.type_cotisation }}</li>
+                                            <li><strong>Période:</strong> {{ cotisation.cotisations.date_debut|date:"d/m/Y" }}
+                                                {% if cotisation.cotisations.date_fin %} - {{ cotisation.cotisations.date_fin|date:"d/m/Y" }}{% endif %}
                                             </li>
                                         </ul>
                                     </div>
                                     <div class="card-footer bg-white">
-                                        <a href="{% url 'payer_cotisation' cotisation.id %}" class="btn btn-primary">
-                                            Payer cette cotisation
-                                        </a>
+                                            {% if cotisation.paiement %}
+                                                {% if cotisation.paiement.statut == 'valide' %}
+                                                        <button class="btn btn-success" disabled>
+                                                            <i class="bi bi-check-circle"></i> Payé (Validé)
+                                                        </button>
+                                                {% elif cotisation.paiement.statut == 'en_attent' %}
+                                                    <button class="btn btn-warning" disabled>
+                                                        <i class="bi bi-hourglass"></i> En attente
+                                                    </button>
+                                                {% elif cotisation.paiement.statut == 'refuse' %}
+                                                    <button class="btn btn-danger" disabled>
+                                                        <i class="bi bi-x-circle"></i> Refusé
+                                                    </button>
+                                                    <a href="{% url 'payer_cotisation' cotisation.cotisations.id %}" class="btn btn-primary">
+                                                        Réessayer
+                                                    </a>
+                                                {% endif %}
+                                            {% else %}
+                                                <a href="{% url 'payer_cotisation' cotisation.cotisations.id %}" class="btn btn-primary">
+                                                    Payer cette cotisation
+                                                </a>
+                                            {% endif %} 
                                     </div>
                                 </div>
                             </div>

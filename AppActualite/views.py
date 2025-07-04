@@ -307,4 +307,4 @@ def ajouter_commentaire(request, form_id):
 def get_commentaires(request, form_id):
     actualite = get_object_or_404(Actualite, id=form_id)
     commentaires = Commentaire.objects.filter(actualite=actualite).order_by('date_commentaire')
-    return render(request, 'ActualiteModalCommentaire.html', {'commentaires': commentaires})
+    return render(request, 'actualites/ActualiteModalCommentaire.html', {'commentaires': commentaires})
