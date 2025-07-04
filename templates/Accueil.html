@@ -4,6 +4,224 @@
 {% block title %}Accueil - Youth{% endblock %}
 
 {% block content %}
+    <section class="hero-section text-center py-5 bg-light">
+        <div class="container py-5 marg">
+            <h1 class="display-4 marg">Bienvenue à l'Association Youth Empowerment</h1>
+            <p class="lead">Nous œuvrons ensemble pour une communauté plus forte et solidaire</p>
+            {% if not session.membres %}
+                <a href="{% url 'inscriptionPage' %}" class="btn btn-primary btn-lg mt-3">Rejoignez-nous</a>
+            {% endif %} 
+        </div>
+    </section>
+
+    <!-- Section Actualités  -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Nos dernières actualités</h2>
+            
+            <div id="actualitesSlider" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for actualite in actualites %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    {% if actualite.images.all %}
+                                        
+                                        {% for image in actualite.images.all|slice:":1" %}
+                                                <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ actualite.titre }}" style="height: 400px; ">
+                                        {% endfor %}
+                                        
+                                    {% endif %}
+                                    <div class="card-body text-center">
+                                        <h3>{{ actualite.titre }}  </h3>
+                                        <h2>{{actualite.evenement.titre}} {{actualite.activite.nom}}</h2>
+                                        <p>{{ actualite.contenue|truncatewords:30 }}</p>
+                                        <a href="#" class="btn btn-outline-primary">Lire la suite</a>
+                                    </div>
+                                    <div class="card-footer text-muted text-center">
+                                        Publié le {{ actualite.date_publication|date:"d/m/Y" }} par {{ actualite.auteur.nom }} {{ actualite.auteur.prenom }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#actualitesSlider" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#actualitesSlider" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'actualite' %}" class="btn btn-primary">Voir toutes les actualités</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Événements et Activités  -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="mb-4 text-center">Prochains événements</h2>
+                    <div id="evenementsSlider" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for evenement in evenements %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <div class="card h-100">
+                                    <img src="{{ evenement.image.url }}" class="card-img-top" alt="{{ evenement.titre }}" style="height: 300px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ evenement.titre }}</h5>
+                                        <p class="card-text">
+                                            <i class="bi bi-calendar-event"></i> {{ evenement.date_debut|date:"d/m/Y H:i" }}
+                                            <br>
+                                            <i class="bi bi-geo-alt"></i> {{ evenement.lieu }}
+                                        </p>
+                                        <a href="{% url 'detail_evenement' evenement.id %}" class="btn btn-sm btn-outline-primary">Détails</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="carousel-item active">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <p>Aucun événement prévu pour le moment.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#evenementsSlider" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#evenementsSlider" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="text-center mt-2">
+                        <a href="{% url 'evenements' %}" class="btn btn-primary">Voir tous les événements</a>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h2 class="mb-4 text-center">Prochaines activités</h2>
+                    <div id="activitesSlider" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for activite in activites %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <div class="card h-100">
+                                    <img src="{{ activite.image.url }}" class="card-img-top" alt="{{ activite.nom }}" style="height: 300px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ activite.nom }}</h5>
+                                        <p class="card-text">
+                                            <i class="bi bi-calendar-event"></i> {{ activite.date_organisation|date:"d/m/Y" }} à {{ activite.horaire_debut|time:"H:i" }}
+                                            <br>
+                                            <i class="bi bi-geo-alt"></i> {{ activite.lieu }}
+                                        </p>
+                                        <a href="{% url 'detail_activite' activite.id %}" class="btn btn-sm btn-outline-primary">Détails</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="carousel-item active">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <p>Aucune activité prévue pour le moment.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#activitesSlider" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#activitesSlider" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="text-center mt-2">
+                        <a href="{% url 'activites' %}" class="btn btn-primary">Voir toutes les activités</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Témoignages (inchangée) -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Témoignages</h2>
+            <div class="row">
+                {% for temoignage in temoignages %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <i class="bi bi-quote fs-1 text-muted"></i>
+                                </div>
+                                <p class="card-text">{{ temoignage.contenu|truncatewords:30 }}</p>
+                                <p class="text-muted mt-auto">— {{ temoignage.auteur.first_name }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-4">
+                {% if request.session.membres %}
+                    <a href="" class="btn btn-outline-primary">Ajouter votre témoignage</a>
+                {% else %}
+                    <a href="{% url 'connexionPage' %}" class="btn btn-primary">Connectez-vous pour témoigner</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <style>
+        nav {
+            z-index: 100;
+        }
+        .marg {
+            margin-top: 2%;
+        }
+        .carousel-item {
+            padding: 10px;
+        }
+        .carousel-control-prev, .carousel-control-next {
+            width: 5%;
+        }
+    </style>
+
+    <!-- Script pour initialiser les carrousels -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Activer tous les carrousels
+            const carousels = document.querySelectorAll('.carousel');
+            carousels.forEach(carousel => {
+                new bootstrap.Carousel(carousel, {
+                    interval: 5000, // Change toutes les 5 secondes
+                    pause: 'hover'
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% comment %} {% extends 'layouts/master.html' %}
+{% load static %}
+
+{% block title %}Accueil - Youth{% endblock %}
+
+{% block content %}
     <section class="hero-section text-center py-5 bg-light ">
         <div class="container py-5 marg">
             <h1 class="display-4 marg ">Bienvenue à l'Association Youth Empworment</h1>
@@ -18,7 +236,7 @@
         <div class="container">
             <h2 class="text-center mb-5">Nos dernières actualités</h2>
             <div class="row">
-                {% comment %} {% for actualite in actualites %}
+                {% for actualite in actualites %}
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             {% if actualite.image %}
@@ -34,7 +252,7 @@
                             </div>
                         </div>
                     </div>
-                {% endfor %}  {% endcomment %}
+                {% endfor %} 
             </div>
             <div class="text-center mt-4">
                 <a href="{% url 'actualite' %}" class="btn btn-primary">Voir toutes les actualités</a>
@@ -50,6 +268,7 @@
                     {% for evenement in evenements %}
                         <div class="card mb-3">
                             <div class="card-body">
+                                <img src="{{ evenement.image.url }}" alt="" height="400vh" width="100%">
                                 <h5 class="card-title">{{ evenement.titre }}</h5>
                                 <p class="card-text">
                                     <i class="bi bi-calendar-event"></i> {{ evenement.date_debut|date:"d/m/Y H:i" }}
@@ -62,13 +281,14 @@
                     {% empty %}
                         <p>Aucun événement prévu pour le moment.</p>
                     {% endfor %} 
-                    <a href="{% url 'evenements' %}" class="btn btn-primary mt-2">Voir tous les événements</a>
+                    <a href="{% url 'evenements' %}" class="btn btn-primary mt-2" style="display: block;">Voir tous les événements</a>
                 </div>
                 <div class="col-md-6">
                     <h2 class="mb-4">Prochaines activités</h2>
                     {% for activite in activites %}
                         <div class="card mb-3">
                             <div class="card-body">
+                                <img src="{{ activite.image.url }}" alt="" height="400vh" width="100%">
                                 <h5 class="card-title">{{ activite.nom }}</h5>
                                 <p class="card-text">
                                     <i class="bi bi-calendar-event"></i> {{ activite.date_organisation|date:"d/m/Y" }} à {{ activite.horaire_debut|time:"H:i" }}
@@ -81,7 +301,7 @@
                     {% empty %}
                         <p>Aucune activité prévue pour le moment.</p>
                     {% endfor %} 
-                    <a href="{% url 'activites' %}" class="btn btn-primary mt-2">Voir toutes les activités</a>
+                    <a href="{% url 'activites' %}" class="btn btn-primary mt-2" style="display:block;">Voir toutes les activités</a>
                 </div>
             </div>
         </div>
@@ -122,4 +342,4 @@
             margin-top: 2%;
         }
     </style>
-{% endblock %}
+{% endblock %} {% endcomment %}

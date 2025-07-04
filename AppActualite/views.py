@@ -203,7 +203,8 @@ def creer_actualite_liee(request, type_objet=None, objet_id=None):
                     )
             
             messages.success(request, "Actualité publiée avec succès !" if actualite.etat == 'publie' else "Actualité soumise pour validation !")
-            return redirect('detail_actualite', form_id=actualite.id)
+            # return redirect('detail_actualite', form_id=actualite.id)
+            return redirect('actualite')
         
         except Exception as e:
             messages.error(request, f"Erreur: {str(e)}")

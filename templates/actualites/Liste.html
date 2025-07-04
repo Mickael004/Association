@@ -56,7 +56,7 @@
                     {{ actualite.etat }}
                 </span>
                 
-                {% if actualite.etat == 'en_attente' and staff %}
+                {% if actualite.etat == 'en_attent' and staff %}
                 <a href="{% url 'valider_publication' actualite.id %}" class="btn btn-sm btn-success ms-2">
                     <i class="bi bi-check-lg"></i> Valider
                 </a>
