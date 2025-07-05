@@ -42,6 +42,15 @@ def inscriptionPage(request):
         return redirect('accueil')
     else:
         return render(request,'inscription.html')
+    
+def VerifMail(email):
+    pattern = r'^[a-zA-Z0-9_.+]+@[a-zA-Z0-9_.+]+\.[a-zA-Z0-9_.+]+$'
+
+    if re.match(pattern,email):
+        return True
+    else: 
+        return False
+    
 def inscrire_membre(request):
     if request.method == 'POST':
         nom = request.POST.get('nom')
@@ -56,47 +65,51 @@ def inscrire_membre(request):
 
         if nom and prenom and emails:
             if not Utilisateur.objects.filter(email=emails).exists():
-                if mot_de_passe==confirm_pwd:
-                    if len(mot_de_passe)>= 8 and re.search(r'[A-Za-z]',mot_de_passe) and re.search(r'[0-9]',mot_de_passe):
-                            
-                        aff = prenom
-                        long_nom = len(nom)
-                        dernier = f"{aff[:3]}_{long_nom}"
-                        if 'photo' in request.FILES:
-                            chemin_image = inserer_photo(request,dernier)
-                            inscrire = Utilisateur(
-                                nom=nom,
-                                prenom = prenom,
-                                date_naissance = date_naissance,
-                                telephone = telephone,
-                                adresse = adresse,
-                                photo = chemin_image ,
-                                email = emails,
-                                date_inscription = datetime.now(),
-                                mot_de_passe = mdp_crypter(mot_de_passe),
-                                role = role
+                if VerifMail(emails):
+                    
+                    if mot_de_passe==confirm_pwd:
+                        if len(mot_de_passe)>= 8 and re.search(r'[A-Za-z]',mot_de_passe) and re.search(r'[0-9]',mot_de_passe):
                                 
-                            )
-                            inscrire.save()
-                            #creation session
+                            aff = prenom
+                            long_nom = len(nom)
+                            dernier = f"{aff[:3]}_{long_nom}"
+                            if 'photo' in request.FILES:
+                                chemin_image = inserer_photo(request,dernier)
+                                inscrire = Utilisateur(
+                                    nom=nom,
+                                    prenom = prenom,
+                                    date_naissance = date_naissance,
+                                    telephone = telephone,
+                                    adresse = adresse,
+                                    photo = chemin_image ,
+                                    email = emails,
+                                    date_inscription = datetime.now(),
+                                    mot_de_passe = mdp_crypter(mot_de_passe),
+                                    role = role
+                                    
+                                )
+                                inscrire.save()
+                                #creation session
 
-                            request.session['membres'] = {
-                                "id" : inscrire.id,
-                                "nom" : inscrire.nom,
-                                "prenom" : inscrire.prenom,
-                                "date_naissance" : inscrire.date_naissance,
-                                "telephone":inscrire.telephone,
-                                "adresse":inscrire.adresse,
-                                "email" : inscrire.email,
-                                "photo" : str(inscrire.photo),
-                                "role" : inscrire.role,
-                                "mot_de_passe": inscrire.mot_de_passe
-                                }
-                            return redirect('http://127.0.0.1:8000/')
+                                request.session['membres'] = {
+                                    "id" : inscrire.id,
+                                    "nom" : inscrire.nom,
+                                    "prenom" : inscrire.prenom,
+                                    "date_naissance" : inscrire.date_naissance,
+                                    "telephone":inscrire.telephone,
+                                    "adresse":inscrire.adresse,
+                                    "email" : inscrire.email,
+                                    "photo" : str(inscrire.photo),
+                                    "role" : inscrire.role,
+                                    "mot_de_passe": inscrire.mot_de_passe
+                                    }
+                                return redirect('http://127.0.0.1:8000/')
+                        else:
+                            return render(request,'inscription.html',{'error':"Mots de passe doit inclure au moins 8 caractères et inclue les lettre et les  chiffre"}) 
                     else:
-                       return render(request,'inscription.html',{'error':"Mots de passe doit inclure au moins 8 caractères et inclue les lettre et les  chiffre"}) 
+                        return render(request,'inscription.html',{'error':"Mots de passe ne correspond pas"})
                 else:
-                    return render(request,'inscription.html',{'error':"Mots de passe ne correspond pas"})
+                    return render(request,'inscription.html',{'error':"Email ne correspond pas à la propriété d'email"})
             else :
                 return render(request,'inscription.html',{'error':"Email Deja une compte"})
 

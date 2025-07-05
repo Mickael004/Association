@@ -4,13 +4,159 @@
 {% block title %}Accueil - Youth{% endblock %}
 
 {% block content %}
-    <section class="hero-section text-center py-5 bg-light">
+    {% comment %} <section class="hero-section text-center py-5 bg-light">
         <div class="container py-5 marg">
             <h1 class="display-4 marg">Bienvenue à l'Association Youth Empowerment</h1>
             <p class="lead">Nous œuvrons ensemble pour une communauté plus forte et solidaire</p>
             {% if not session.membres %}
                 <a href="{% url 'inscriptionPage' %}" class="btn btn-primary btn-lg mt-3">Rejoignez-nous</a>
             {% endif %} 
+        </div>
+    </section> {% endcomment %}
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center py-5 bg-light position-relative">
+        <div class="container py-5 marg">
+            <h1 class="display-4 marg" style="color:rgba(var(--bs-primary-rgb), var(--bs-bg-opacity)) !important;">Bienvenue à l'Association Youth Empowerment</h1>
+            <p class="lead" style="color: bisque;">Nous œuvrons ensemble pour une communauté plus forte et solidaire</p>
+            {% if not session.membres %}
+                <a href="{% url 'inscriptionPage' %}" class="btn btn-primary btn-lg mt-3" style="    margin-bottom: 20px;">Rejoignez-nous</a>
+            {% endif %}
+        </div>
+        <div class="position-absolute bottom-0 start-0 end-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                <path fill="#ffffff" fill-opacity="1" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            </svg>
+        </div>
+    </section>
+
+     <!-- Section Bienvenue -->
+     <section class="py-5 bg-white">
+        <div class="container">
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-6">
+                    <h2 class="display-5 fw-bold mb-4">Bienvenue chez Youth Empowerment</h2>
+                    <p class="lead">Depuis notre création, nous nous engageons à autonomiser les jeunes et à construire des communautés résilientes.</p>
+                    <p>Notre association est un espace d'échange, d'apprentissage et d'action où chaque membre peut contribuer à des projets transformateurs. Nous croyons en la force collective et en la capacité de chacun à apporter des solutions innovantes aux défis de notre société.</p>
+                    <div class="mt-4">
+                        <a href="{% url 'aproposPage' %}" class="btn btn-primary me-2">Notre histoire</a>
+                        <a href="{% url 'activites' %}" class="btn btn-outline-primary">Nos actions</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <img src="{% static 'images/Accueil/activite.jpg' %}" alt="Activité communautaire" class="img-fluid rounded shadow-sm h-100 object-fit-cover" style="min-height: 200px;">
+                        </div>
+                        <div class="col-6">
+                            <img src="{% static 'images/Accueil/1.jpg' %}" alt="Groupe de jeunes" class="img-fluid rounded shadow-sm h-100 object-fit-cover" style="min-height: 200px;">
+                        </div>
+                        <div class="col-6">
+                            <img src="{% static 'images/Accueil/about-4.jpg' %}" alt="Atelier formation" class="img-fluid rounded shadow-sm h-100 object-fit-cover" style="min-height: 200px;">
+                        </div>
+                        <div class="col-6">
+                            <img src="{% static 'images/Accueil/atelier.jpg' %}" alt="Événement festif" class="img-fluid rounded shadow-sm h-100 object-fit-cover" style="min-height: 200px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             {% comment %} <!-- Chiffres clés -->
+             <div class="row g-4 text-center py-4 mt-4 bg-light rounded-3">
+                <div class="col-md-3">
+                    <div class="p-3">
+                        <h3 class="text-primary fw-bold display-5">10+</h3>
+                        <p class="mb-0">Années d'expérience</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3">
+                        <h3 class="text-primary fw-bold display-5">500+</h3>
+                        <p class="mb-0">Bénévoles actifs</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3">
+                        <h3 class="text-primary fw-bold display-5">100+</h3>
+                        <p class="mb-0">Projets réalisés</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3">
+                        <h3 class="text-primary fw-bold display-5">20+</h3>
+                        <p class="mb-0">Communautés impactées</p>
+                    </div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </section>
+
+    <!-- Small Effort Big Change Section -->
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <img src="{% static 'images/Accueil/4.jpg' %}" alt="Small Effort Make Big Change" class="img-fluid rounded shadow">
+                </div>
+                <div class="col-md-6">
+                    <h2 class="display-5 fw-bold text-primary">Un petit effort, <span class="text-secondary">Grand Changement</span></h2>
+                    <p class="lead mt-4">
+                        Chaque petite action compte dans notre mission pour créer un impact positif dans la communauté. 
+                        Rejoignez-nous et devenez un acteur du changement !
+                    </p>
+                    <div class="d-flex mt-4">
+                        <div class="pe-4 border-end">
+                            <h3 class="text-primary">+500</h3>
+                            <p>Membres actifs</p>
+                        </div>
+                        <div class="px-4 border-end">
+                            <h3 class="text-primary">+100</h3>
+                            <p>Projets réalisés</p>
+                        </div>
+                        <div class="ps-4">
+                            <h3 class="text-primary">+10</h3>
+                            <p>Partenaires</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'aproposPage' %}" class="btn btn-outline-primary mt-4">En savoir plus</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Valeurs Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Nos Valeurs</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4">
+                        <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle mx-auto mb-4">
+                            <i class="bi bi-people-fill fs-2"></i>
+                        </div>
+                        <h3>Solidarité</h3>
+                        <p>Nous croyons en la force de la communauté et de l'entraide mutuelle.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4">
+                        <div class="icon-box bg-success bg-opacity-10 text-success rounded-circle mx-auto mb-4">
+                            <i class="bi bi-lightbulb fs-2"></i>
+                        </div>
+                        <h3>Innovation</h3>
+                        <p>Nous encourageons des solutions créatives aux défis communautaires.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4">
+                        <div class="icon-box bg-warning bg-opacity-10 text-warning rounded-circle mx-auto mb-4">
+                            <i class="bi bi-shield-check fs-2"></i>
+                        </div>
+                        <h3>Transparence</h3>
+                        <p>Nous agissons avec intégrité et rendons compte de nos actions.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -35,8 +181,7 @@
                                     {% endif %}
                                     <div class="card-body text-center">
                                         <h3>{{ actualite.titre }}  </h3>
-                                        <h2>{{actualite.evenement.titre}} {{actualite.activite.nom}}</h2>
-                                        <p>{{ actualite.contenue|truncatewords:30 }}</p>
+                                        <p>{{ actualite.contenue|safe|truncatewords:30 }}</p>
                                         <a href="#" class="btn btn-outline-primary">Lire la suite</a>
                                     </div>
                                     <div class="card-footer text-muted text-center">
@@ -63,6 +208,20 @@
             </div>
         </div>
     </section>
+
+    <!-- Call to Action -->
+    {% if not session.membres %}
+        <section class="py-5 bg-primary text-white">
+            <div class="container text-center">
+                <h2 class="display-5 mb-4">Prêt à faire la différence ?</h2>
+                <p class="lead mb-5">Rejoignez notre communauté et participez à nos initiatives transformatrices.</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'inscriptionPage' %}" class="btn btn-light btn-lg px-4">Devenir Membre</a>
+                    <a href="" class="btn btn-outline-light btn-lg px-4">Nous Contacter</a>
+                </div>
+            </div>
+        </section>
+    {% endif %}
 
     <!-- Section Événements et Activités  -->
     <section class="py-5 bg-light">
@@ -186,12 +345,64 @@
         </div>
     </section>
 
+    <!-- Partenaires -->
+    {% comment %} <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Nos Partenaires</h2>
+            <div class="row justify-content-center align-items-center g-4">
+                <div class="col-6 col-md-3">
+                    <img src="{% static 'images/partner1.png' %}" alt="Partenaire 1" class="img-fluid grayscale">
+                </div>
+                <div class="col-6 col-md-3">
+                    <img src="{% static 'images/partner2.png' %}" alt="Partenaire 2" class="img-fluid grayscale">
+                </div>
+                <div class="col-6 col-md-3">
+                    <img src="{% static 'images/partner3.png' %}" alt="Partenaire 3" class="img-fluid grayscale">
+                </div>
+                <div class="col-6 col-md-3">
+                    <img src="{% static 'images/partner4.png' %}" alt="Partenaire 4" class="img-fluid grayscale">
+                </div>
+            </div>
+        </div>
+    </section> {% endcomment %}
+
     <style>
         nav {
             z-index: 100;
         }
         .marg {
             margin-top: 2%;
+        }
+        .welcome-img {
+            transition: transform 0.3s ease;
+        }
+        .welcome-img:hover {
+            transform: scale(1.03);
+        }
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+        }
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .grayscale {
+            filter: grayscale(100%);
+            transition: filter 0.3s ease;
+        }
+        .grayscale:hover {
+            filter: grayscale(0%);
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
         .carousel-item {
             padding: 10px;
@@ -216,130 +427,3 @@
     </script>
 {% endblock %}
 
-{% comment %} {% extends 'layouts/master.html' %}
-{% load static %}
-
-{% block title %}Accueil - Youth{% endblock %}
-
-{% block content %}
-    <section class="hero-section text-center py-5 bg-light ">
-        <div class="container py-5 marg">
-            <h1 class="display-4 marg ">Bienvenue à l'Association Youth Empworment</h1>
-            <p class="lead">Nous œuvrons ensemble pour une communauté plus forte et solidaire</p>
-            {% if not session.membres %}
-                <a href="{% url 'inscriptionPage' %}" class="btn btn-primary btn-lg mt-3">Rejoignez-nous</a>
-            {% endif %} 
-        </div>
-    </section>
-
-    <section class="py-5">
-        <div class="container">
-            <h2 class="text-center mb-5">Nos dernières actualités</h2>
-            <div class="row">
-                {% for actualite in actualites %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100">
-                            {% if actualite.image %}
-                                <img src="{{ actualite.image.url }}" class="card-img-top" alt="{{ actualite.titre }}">
-                            {% endif %}
-                            <div class="card-body">
-                                <h5 class="card-title">{{ actualite.titre }}</h5>
-                                <p class="card-text">{{ actualite.contenu|truncatewords:20 }}</p>
-                                <a href="" class="btn btn-outline-primary">Lire la suite</a>
-                            </div>
-                            <div class="card-footer text-muted">
-                                Publié le {{ actualite.date_publication|date:"d/m/Y" }} par {{ actualite.auteur.first_name }}
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %} 
-            </div>
-            <div class="text-center mt-4">
-                <a href="{% url 'actualite' %}" class="btn btn-primary">Voir toutes les actualités</a>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h2 class="mb-4">Prochains événements</h2>
-                    {% for evenement in evenements %}
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <img src="{{ evenement.image.url }}" alt="" height="400vh" width="100%">
-                                <h5 class="card-title">{{ evenement.titre }}</h5>
-                                <p class="card-text">
-                                    <i class="bi bi-calendar-event"></i> {{ evenement.date_debut|date:"d/m/Y H:i" }}
-                                    <br>
-                                    <i class="bi bi-geo-alt"></i> {{ evenement.lieu }}
-                                </p>
-                                <a href="{% url 'detail_evenement' evenement.id %}" class="btn btn-sm btn-outline-primary">Détails</a>
-                            </div>
-                        </div>
-                    {% empty %}
-                        <p>Aucun événement prévu pour le moment.</p>
-                    {% endfor %} 
-                    <a href="{% url 'evenements' %}" class="btn btn-primary mt-2" style="display: block;">Voir tous les événements</a>
-                </div>
-                <div class="col-md-6">
-                    <h2 class="mb-4">Prochaines activités</h2>
-                    {% for activite in activites %}
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <img src="{{ activite.image.url }}" alt="" height="400vh" width="100%">
-                                <h5 class="card-title">{{ activite.nom }}</h5>
-                                <p class="card-text">
-                                    <i class="bi bi-calendar-event"></i> {{ activite.date_organisation|date:"d/m/Y" }} à {{ activite.horaire_debut|time:"H:i" }}
-                                    <br>
-                                    <i class="bi bi-geo-alt"></i> {{ activite.lieu }}
-                                </p>
-                                <a href="{% url 'detail_activite' activite.id %}" class="btn btn-sm btn-outline-primary">Détails</a>
-                            </div>
-                        </div>
-                    {% empty %}
-                        <p>Aucune activité prévue pour le moment.</p>
-                    {% endfor %} 
-                    <a href="{% url 'activites' %}" class="btn btn-primary mt-2" style="display:block;">Voir toutes les activités</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-5">
-        <div class="container">
-            <h2 class="text-center mb-5">Témoignages</h2>
-            <div class="row">
-                {% for temoignage in temoignages %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100">
-                            <div class="card-body text-center">
-                                <div class="mb-3">
-                                    <i class="bi bi-quote fs-1 text-muted"></i>
-                                </div>
-                                <p class="card-text">{{ temoignage.contenu|truncatewords:30 }}</p>
-                                <p class="text-muted mt-auto">— {{ temoignage.auteur.first_name }}</p>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-            <div class="text-center mt-4">
-                {% if request.session.membres %}
-                    <a href="" class="btn btn-outline-primary">Ajouter votre témoignage</a>
-                {% else %}
-                    <a href="{% url 'connexionPage' %}" class="btn btn-primary">Connectez-vous pour témoigner</a>
-                {% endif %}
-            </div>
-        </div>
-    </section>
-    <style>
-        nav{
-            z-index: 100;
-        }
-        .marg{
-            margin-top: 2%;
-        }
-    </style>
-{% endblock %} {% endcomment %}
